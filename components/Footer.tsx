@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Facebook, Instagram, Twitter, Mail, Phone, ArrowRight, Sparkles } from "lucide-react";
+import { Heart, Mail, Phone, ArrowRight, Sparkles } from "lucide-react";
+import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 import Link from "next/link";
 import { Button } from "@/components/button";
 
@@ -16,7 +17,7 @@ export function Footer() {
       transition: {
         staggerChildren: 0.1,
         delayChildren: 0.2,
-      },
+      },                                                    
     },
   };
 
@@ -56,9 +57,9 @@ export function Footer() {
         
         {/* Decorative Background Sparkle */}
         <div className="absolute top-10 right-10 opacity-10 pointer-events-none">
-             <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
-                <Sparkles size={150} className="text-primary" />
-             </motion.div>
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
+            <Sparkles size={150} className="text-primary" />
+          </motion.div>
         </div>
 
         <motion.div
@@ -73,22 +74,22 @@ export function Footer() {
             {/* Brand Section (Left) */}
             <motion.div variants={itemVariants} className="md:col-span-5 lg:col-span-4 space-y-6">
               <div className="flex items-center gap-3">
-                 <div className="relative">
-                    {/* Glowing effect behind logo */}
-                    <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full" />
-                    <motion.img
-                      src="/logo.png" // Make sure this matches your file in public
-                      alt="Cocoon"
-                      className="h-16 w-auto relative z-10"
-                      whileHover={{ scale: 1.1, rotate: 10 }}
-                    />
-                 </div>
-                 <div>
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                      Cocoon Kids
-                    </h3>
-                    <p className="text-xs tracking-wider uppercase text-primary font-medium">Little Princess Dreams</p>
-                 </div>
+                <div className="relative">
+                  {/* Glowing effect behind logo */}
+                  <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full" />
+                  <motion.img
+                    src="/logo.png"
+                    alt="Cocoon"
+                    className="h-16 w-auto relative z-10"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Cocoon Kids
+                  </h3>
+                  <p className="text-xs tracking-wider uppercase text-primary font-medium">Little Princess Dreams</p>
+                </div>
               </div>
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
                 Creating magical moments with beautiful frocks for your little ones. 
@@ -96,7 +97,7 @@ export function Footer() {
               </p>
               
               <div className="flex gap-4">
-                {[Facebook, Instagram, Twitter].map((Icon, i) => (
+                {[FaFacebookF, FaInstagram, FaTwitter].map((Icon, i) => (
                   <motion.a
                     key={i}
                     href="#"
@@ -134,41 +135,40 @@ export function Footer() {
             {/* Newsletter "Glass Card" (Right) */}
             <motion.div variants={itemVariants} className="md:col-span-4 lg:col-span-4">
               <h4 className="text-lg font-bold text-foreground mb-6">Stay in the Magic</h4>
-              {/* Glassmorphism Box */}
               <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl shadow-xl shadow-pink-100/50 border border-white">
                 <p className="text-sm text-muted-foreground mb-4">Subscribe for exclusive offers and new arrivals!</p>
                 <div className="space-y-3">
-                   <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <input 
-                        type="email" 
-                        placeholder="mommy@email.com" 
-                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-pink-100 bg-pink-50/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
-                      />
-                   </div>
-                   <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
-                      Subscribe
-                   </Button>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <input 
+                      type="email" 
+                      placeholder="mommy@email.com" 
+                      className="w-full pl-10 pr-4 py-2 rounded-xl border border-pink-100 bg-pink-50/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+                    />
+                  </div>
+                  <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
+                    Subscribe
+                  </Button>
                 </div>
               </div>
               
               <div className="mt-6 flex flex-col gap-2 text-sm text-muted-foreground pl-2">
-                 <div className="flex items-center gap-2">
-                    <Phone size={16} className="text-primary" />
-                    <span>+94 77 123 4567</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                    <Mail size={16} className="text-primary" />
-                    <span>hello@cocoonkids.lk</span>
-                 </div>
+                <div className="flex items-center gap-2">
+                  <Phone size={16} className="text-primary" />
+                  <span>+94 77 123 4567</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail size={16} className="text-primary" />
+                  <span>hello@cocoonkids.lk</span>
+                </div>
               </div>
             </motion.div>
           </div>
 
           <div className="mt-16 pt-8 border-t border-pink-100 text-center">
-             <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                © {currentYear} Cocoon Kids. Made with <Heart size={14} className="text-red-500 fill-red-500 animate-pulse" /> in Sri Lanka.
-             </p>
+            <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+              © {currentYear} Cocoon Kids. Made with <Heart size={14} className="text-red-500 fill-red-500 animate-pulse" /> in Sri Lanka.
+            </p>
           </div>
         </motion.div>
       </div>
