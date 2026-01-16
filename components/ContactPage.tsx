@@ -144,7 +144,7 @@ export function ContactPage() {
                   icon: Phone,
                   title: "Phone",
                   content: "+94 77 383 4674", // Updated with number from context
-                  subtext: "Mon-Fri 9am-6pm",
+                  subtext: "Mon-Sun 9am-6pm",
                 },
                 {
                   icon: Mail,
