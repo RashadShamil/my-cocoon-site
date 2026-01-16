@@ -56,7 +56,7 @@ export function Navigation() {
             </div>
             <div className="hidden sm:block">
               <span className="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Cocoon
+                Cocoon Kids
               </span>
             </div>
           </Link>

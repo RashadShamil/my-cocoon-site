@@ -59,7 +59,8 @@ export function ShopPage({ products }: ShopPageProps) {
               type="text"
               placeholder="Search for a dress..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => 
+                setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all shadow-sm"
             />
           </div>

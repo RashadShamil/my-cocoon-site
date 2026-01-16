@@ -1,15 +1,33 @@
 "use client";
 
+import { useState } from "react"; // ✅ Added for state management
 import { motion } from "framer-motion";
-import { Heart, Mail, Phone, ArrowRight, Sparkles } from "lucide-react";
-import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
+import { Heart, Mail, Phone, ArrowRight, Sparkles, Facebook, Instagram, Twitter } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/button";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState(""); // ✅ Track email input
 
-  // Animation variants for stagger effect
+  // ✅ Handle Subscription
+  const handleSubscribe = () => {
+    if (!email) {
+      alert("Please enter your email address.");
+      return;
+    }
+
+    const recipient = "Coccoonkids@gmail.com";
+    const subject = "Newsletter Subscription Request";
+    const body = `Hi Cocoon Kids,\n\nPlease add my email (${email}) to your newsletter list for exclusive offers!\n\nThank you!`;
+
+    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Optional: Clear input
+    setEmail("");
+  };
+
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -17,7 +35,7 @@ export function Footer() {
       transition: {
         staggerChildren: 0.1,
         delayChildren: 0.2,
-      },                                                    
+      },                                              
     },
   };
 
@@ -32,7 +50,7 @@ export function Footer() {
 
   return (
     <footer className="relative mt-32">
-      {/* 1. THE WOW FACTOR: SVG Wave Top */}
+      {/* SVG Wave Top */}
       <div className="absolute top-0 left-0 right-0 -translate-y-[98%] w-full overflow-hidden leading-none z-10">
         <svg
           className="relative block w-full h-[80px] md:h-[120px]"
@@ -75,7 +93,6 @@ export function Footer() {
             <motion.div variants={itemVariants} className="md:col-span-5 lg:col-span-4 space-y-6">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  {/* Glowing effect behind logo */}
                   <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full" />
                   <motion.img
                     src="/logo.png"
@@ -97,7 +114,7 @@ export function Footer() {
               </p>
               
               <div className="flex gap-4">
-                {[FaFacebookF, FaInstagram, FaTwitter].map((Icon, i) => (
+                {[Facebook, Instagram, Twitter].map((Icon, i) => (
                   <motion.a
                     key={i}
                     href="#"
@@ -140,13 +157,20 @@ export function Footer() {
                 <div className="space-y-3">
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    {/* ✅ FIX: Added value and onChange for controlled input */}
                     <input 
                       type="email" 
                       placeholder="mommy@email.com" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 rounded-xl border border-pink-100 bg-pink-50/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
                     />
                   </div>
-                  <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
+                  {/* ✅ FIX: Added onClick handler */}
+                  <Button 
+                    onClick={handleSubscribe}
+                    className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
+                  >
                     Subscribe
                   </Button>
                 </div>
@@ -155,11 +179,11 @@ export function Footer() {
               <div className="mt-6 flex flex-col gap-2 text-sm text-muted-foreground pl-2">
                 <div className="flex items-center gap-2">
                   <Phone size={16} className="text-primary" />
-                  <span>+94 77 123 4567</span>
+                  <span>+94 77 383 4674</span> {/* Updated Number */}
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={16} className="text-primary" />
-                  <span>hello@cocoonkids.lk</span>
+                  <span>Coccoonkids@gmail.com</span> {/* Updated Email */}
                 </div>
               </div>
             </motion.div>

@@ -26,7 +26,7 @@ const features = [
     icon: Users,
     title: "Happy Families",
     description:
-      "Join hundreds of satisfied families who trust Cocoon for their children's special moments.",
+      "Join hundreds of satisfied families who trust cocoon kids for their children's special moments.",
   },
 ];
 
@@ -62,19 +62,19 @@ export function AboutPage() {
               transition={{ delay: 0.2, type: "spring" }}
               className="mb-6"
             >
-              <img src="/logo.png" alt="Cocoon Logo" className="w-24 h-24" />
+              <img src="/logo.png" alt="cocoon kids Logo" className="w-24 h-24" />
             </motion.div>
 
             <h1 className="text-5xl font-bold mb-6">
-              About <span className="text-primary">Cocoon</span>
+              About <span className="text-primary">Cocoon Kids</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              At Cocoon, we believe every little girl deserves to feel like a
+              At Cocoon Kids, we believe every little girl deserves to feel like a
               princess. Our journey began with a simple dream: to create beautiful,
               comfortable frocks that make childhood moments truly magical.
             </p>
             <p className="text-lg text-muted-foreground mb-6">
-              Just like a butterfly emerges from its cocoon, we help your little
+              Just like a butterfly emerges from its cocoon kids, we help your little
               ones blossom with confidence and grace through our carefully designed
               collections.
             </p>
@@ -223,10 +223,10 @@ export function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             {[
-              { number: "2020", label: "Established" },
-              { number: "500+", label: "Happy Customers" },
-              { number: "50+", label: "Unique Designs" },
-              { number: "100%", label: "Satisfaction" },
+              { number: "100%", label: "Handmade with Love" },
+              { number: "Premium", label: "Quality Fabrics" },
+              { number: "Islandwide", label: "Fast Delivery" },
+              { number: "Top Rated", label: "Customer Service" },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}

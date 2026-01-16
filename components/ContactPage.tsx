@@ -16,9 +16,17 @@ export function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock form submission
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    
+    // 1. Construct the email details
+    const recipient = "Coccoonkids@gmail.com";
+    const subject = `New Inquiry from ${formData.name}`;
+    const body = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nMessage:\n${formData.message}`;
+
+    // 2. Open the user's email client
+    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    // 3. Optional: Clear form or show success message
+    // setFormData({ name: "", email: "", phone: "", message: "" });
   };
 
   return (
@@ -85,7 +93,7 @@ export function ContactPage() {
                   <label className="block mb-2">Phone Number</label>
                   <Input
                     type="tel"
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+94771234567"
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
@@ -135,20 +143,20 @@ export function ContactPage() {
                 {
                   icon: Phone,
                   title: "Phone",
-                  content: "",
-                  subtext: "",
+                  content: "+94 77 383 4674", // Updated with number from context
+                  subtext: "Mon-Fri 9am-6pm",
                 },
                 {
                   icon: Mail,
                   title: "Email",
-                  content: "",
-                  subtext: "",
+                  content: "Coccoonkids@gmail.com",
+                  subtext: "We reply within 24 hours",
                 },
                 {
                   icon: MapPin,
                   title: "Visit Us",
-                  content: "",
-                  subtext: "",
+                  content: "Factory outlet: 4/3, Isnapulla Road, Dharga Town, Aluthgama",
+                  subtext: "Come say hello!",
                 },
               ].map((item, index) => (
                 <motion.div

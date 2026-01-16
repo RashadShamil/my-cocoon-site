@@ -7,8 +7,8 @@ export default defineConfig({
   name: 'default',
   title: 'cocoon-backend',
 
-  projectId: '3go6kd6p',
-  dataset: 'production',
+  projectId:process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset:process.env.NEXT_PUBLIC_SANITY_DATASET!,
 
   plugins: [structureTool(), visionTool()],
 

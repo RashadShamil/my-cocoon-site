@@ -176,7 +176,7 @@ export function WelcomeIntro() {
               transition={{ delay: 3.5, duration: 1.5 }}
               className="text-xl md:text-3xl text-muted-foreground font-light italic"
             >
-              "Where Little Princesses Bloom"
+              "Spreading joy, love and style"
             </motion.p>
           </div>
 

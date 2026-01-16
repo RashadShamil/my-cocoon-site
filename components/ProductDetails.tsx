@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { urlFor } from "@/sanity/lib/image";
 import Image from "next/image";
-import { Star, Truck, ShieldCheck, MessageCircle } from "lucide-react";
+// ✅ FIX: Using only "Safe" icons that definitely exist in your version
+import { Star, MapPin, Mail } from "lucide-react";
 import { Button } from "@/components/button"; 
 
 interface ProductProps {
@@ -51,11 +52,11 @@ export default function ProductDetails({ product }: ProductProps) {
       {/* LEFT: Image System */}
       <div className="flex flex-col gap-4">
         
-        {/* 1. BIG IMAGE (Updated to use State) */}
+        {/* 1. BIG IMAGE */}
         <div className="relative h-[400px] md:h-[500px] bg-pink-50 rounded-3xl overflow-hidden shadow-sm">
           {mainImage && (
             <Image
-              src={urlFor(mainImage).url()} // ✅ FIX: Use 'mainImage', not 'product.imageUrl'
+              src={urlFor(mainImage).url()} 
               alt={product.name}
               fill
               className="object-cover transition-all duration-500"
@@ -63,13 +64,13 @@ export default function ProductDetails({ product }: ProductProps) {
           )}
         </div>
 
-        {/* 2. THUMBNAILS ROW (This was missing) */}
+        {/* 2. THUMBNAILS ROW */}
         {allImages.length > 1 && (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {allImages.map((img, index) => (
               <button
                 key={index}
-                onClick={() => setMainImage(img)} // ✅ FIX: Updates the big image on click
+                onClick={() => setMainImage(img)}
                 className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${
                   mainImage === img 
                     ? "border-pink-500 scale-105" 
@@ -88,7 +89,7 @@ export default function ProductDetails({ product }: ProductProps) {
         )}
       </div>
 
-      {/* RIGHT: Details (Kept exactly the same) */}
+      {/* RIGHT: Details */}
       <div className="flex flex-col justify-center">
         <div className="mb-6">
           <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-semibold uppercase tracking-wide">
@@ -141,17 +142,20 @@ export default function ProductDetails({ product }: ProductProps) {
           onClick={handleBuyNow}
           className="w-full py-8 text-xl bg-[#25D366] hover:bg-[#128C7E] text-white mb-8 transition-colors shadow-lg hover:shadow-xl"
         >
-          <MessageCircle className="mr-2 h-6 w-6" />
+          {/* ✅ FIX: Using Mail (Safe Icon) */}
+          <Mail className="mr-2 h-6 w-6" />
           Order on WhatsApp
         </Button>
 
         <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 bg-gray-50 p-4 rounded-xl">
           <div className="flex items-center gap-3">
-            <Truck className="w-5 h-5 text-primary" />
+            {/* ✅ FIX: Using MapPin (Safe Icon) */}
+            <MapPin className="w-5 h-5 text-primary" />
             <span>Island-wide Delivery</span>
           </div>
           <div className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-primary" />
+            {/* ✅ FIX: Reusing Star (Safe Icon) */}
+            <Star className="w-5 h-5 text-primary" />
             <span>Premium Material</span>
           </div>
         </div>

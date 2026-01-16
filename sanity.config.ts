@@ -8,7 +8,7 @@ export default defineConfig({
   title: 'Cocoon Admin',
 
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!, 
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
 
   basePath: '/studio', // This means your client goes to website.com/studio to login
 
