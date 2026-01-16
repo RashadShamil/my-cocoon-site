@@ -24,7 +24,8 @@ export function ShopPage({ products }: ShopPageProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState(""); // ✅ NEW: Track search text
 
-  const uniqueCategories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
+  // ✅ FIX: .filter(Boolean) removes empty categories so you don't get blank buttons
+const uniqueCategories = ["All", ...Array.from(new Set(products.map((p) => p.category).filter(Boolean)))];
 
   // ✅ UPDATED FILTER LOGIC: Checks Category AND Search Text
   const filteredProducts = products.filter((product) => {

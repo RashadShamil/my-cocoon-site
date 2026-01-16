@@ -159,7 +159,7 @@ export function WelcomeIntro() {
                 transition={{ delay: 1.5, duration: 1.5, type: "spring", bounce: 0.5 }}
                 className="text-6xl md:text-9xl font-extrabold bg-gradient-to-r from-primary via-pink-400 to-accent bg-clip-text text-transparent pb-4"
               >
-                Cocoon
+                Cocoon Kids
               </motion.div>
             </motion.div>
 
