@@ -57,7 +57,7 @@ export function ShopPage({ products }: ShopPageProps) {
       ========================================= */}
       <motion.div 
         style={{ y, opacity }} 
-        className="fixed top-0 left-0 w-full h-[120vh] -z-10"
+        className="fixed top-0 left-0 w-full h-[140vh] -z-10"
       >
         <img
           // ⚠️ REPLACE with your beautiful banner image path

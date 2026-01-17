@@ -57,7 +57,7 @@ export function AboutPage() {
       ========================================= */}
       <motion.div
           style={{ y }}
-          className="fixed inset-0 w-full h-[120vh] -z-10"
+          className="fixed inset-0 w-full h-[140vh] -z-10"
       >
          <img 
             // ⚠️ Ensure this image exists in your public folder

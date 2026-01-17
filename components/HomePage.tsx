@@ -63,7 +63,7 @@ export function HomePage({ products }: HomePageProps) {
       ========================================= */}
       <motion.div 
         style={{ y, opacity }} 
-        className="fixed top-0 left-0 w-full h-[120vh] -z-10 pointer-events-none"
+        className="fixed top-0 left-0 w-full h-[140vh] -z-10 pointer-events-none"
       >
         <img
           // ⚠️ REPLACE with your beautiful banner image
