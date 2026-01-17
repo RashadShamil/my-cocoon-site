@@ -45,7 +45,7 @@ export function AboutPage() {
   });
 
   // Map scroll to movement. The image moves slower (0% -> 20%) than the scroll.
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   return (
     // Main container gets the ref
@@ -57,7 +57,7 @@ export function AboutPage() {
       ========================================= */}
       <motion.div
           style={{ y }}
-          className="fixed inset-0 w-full h-[140vh] -z-10"
+          className="fixed inset-0 w-full h-[160vh] -z-10"
       >
          <img 
             // ⚠️ Ensure this image exists in your public folder

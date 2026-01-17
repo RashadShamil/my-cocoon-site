@@ -37,7 +37,7 @@ export function ContactPage() {
   });
 
   // Map scroll to movement. The background moves slower than scroll (0% to 20%)
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   return (
     // ✅ Added ref and changed to relative
@@ -48,7 +48,7 @@ export function ContactPage() {
       ========================================= */}
       <motion.div 
         style={{ y }} 
-        className="fixed top-0 left-0 w-full h-[140vh] -z-10"
+        className="fixed top-0 left-0 w-full h-[160vh] -z-10"
       >
         <img
           // ⚠️ REPLACE with your beautiful banner image path

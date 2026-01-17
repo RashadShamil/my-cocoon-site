@@ -40,7 +40,7 @@ export function HomePage({ products }: HomePageProps) {
   });
 
   // 2. Map scroll to parallax movement
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 0.5, 0]);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export function HomePage({ products }: HomePageProps) {
       ========================================= */}
       <motion.div 
         style={{ y, opacity }} 
-        className="fixed top-0 left-0 w-full h-[140vh] -z-10 pointer-events-none"
+        className="fixed top-0 left-0 w-full h-[160vh] -z-10 pointer-events-none"
       >
         <img
           // ⚠️ REPLACE with your beautiful banner image

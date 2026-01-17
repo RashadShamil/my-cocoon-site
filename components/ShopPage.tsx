@@ -35,7 +35,7 @@ export function ShopPage({ products }: ShopPageProps) {
   });
 
   // Map scroll to movement. The background moves slower than scroll (0% to 30%)
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   // Optional: slight fade out as you scroll way down
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.7]);
 
@@ -57,7 +57,7 @@ export function ShopPage({ products }: ShopPageProps) {
       ========================================= */}
       <motion.div 
         style={{ y, opacity }} 
-        className="fixed top-0 left-0 w-full h-[140vh] -z-10"
+        className="fixed top-0 left-0 w-full h-[160vh] -z-10"
       >
         <img
           // ⚠️ REPLACE with your beautiful banner image path
