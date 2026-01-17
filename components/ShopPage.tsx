@@ -35,7 +35,7 @@ export function ShopPage({ products }: ShopPageProps) {
   });
 
   // Map scroll to movement. The background moves slower than scroll (0% to 30%)
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   // Optional: slight fade out as you scroll way down
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.7]);
 

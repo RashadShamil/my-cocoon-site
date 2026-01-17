@@ -45,7 +45,7 @@ export function AboutPage() {
   });
 
   // Map scroll to movement. The image moves slower (0% -> 20%) than the scroll.
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
 
   return (
     // Main container gets the ref

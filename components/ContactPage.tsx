@@ -37,7 +37,7 @@ export function ContactPage() {
   });
 
   // Map scroll to movement. The background moves slower than scroll (0% to 20%)
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
 
   return (
     // ✅ Added ref and changed to relative

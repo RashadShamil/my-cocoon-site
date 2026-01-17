@@ -40,7 +40,7 @@ export function HomePage({ products }: HomePageProps) {
   });
 
   // 2. Map scroll to parallax movement
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 0.5, 0]);
 
   useEffect(() => {
