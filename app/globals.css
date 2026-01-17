@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    /* The "Cocoon" Color Palette */
-    --background: 335 50% 98%;      /* #FFF5F8 (Soft Cream) */
+    /* The "Cocoon" Color Palette - Kept intact */
+    --background: 335 50% 98%;      /* #FFF5F8 (Soft Cream) - Still defining it, just not using it globally on body */
     --foreground: 292 25% 14%;      /* #2D1B2E (Dark Purple Text) */
     
     --primary: 325 68% 69%;         /* #E879B9 (Butterfly Pink) */
@@ -28,7 +28,11 @@
   * {
     @apply border-gray-200;
   }
+  
+  /* ✅ THE FIX IS HERE */
   body {
-    @apply bg-background text-foreground;
+    /* Removed 'bg-background' so the body is transparent by default,
+       allowing the parallax image behind it to show through. */
+    @apply text-foreground min-h-screen overflow-x-hidden;
   }
 }
