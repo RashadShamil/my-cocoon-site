@@ -1,16 +1,28 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Menu, X, Heart, Sparkles } from "lucide-react";
+// ✅ THE FIX: We rename 'User' to 'UserIcon' right here in the import.
+// If 'User' is red here, please try the 'npm i lucide-react@latest' step above.
+import { ShoppingBag, Menu, X, Heart, Sparkles, User as UserIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/button";
+// Import Clerk hooks and components
+import { useUser, UserButton } from "@clerk/nextjs";
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname(); // Automatically detects current page
+  const pathname = usePathname();
+  
+  // Get user data from Clerk
+  // ✅ Because we renamed the icon in the imports, this 'user' variable is safe to use.
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  // --- CART STATE PLACEHOLDER ---
+  const cartItemCount = 0;
+
 
   // Detect scroll to shrink the navbar slightly
   useEffect(() => {
@@ -41,14 +53,14 @@ export function Navigation() {
             width: isScrolled ? "90%" : "95%",
             padding: isScrolled ? "0.75rem 1.5rem" : "1rem 2rem",
           }}
-          className="max-w-6xl rounded-full bg-white/70 backdrop-blur-md border border-white/50 shadow-lg shadow-pink-100/50 flex items-center justify-between"
+          className="max-w-7xl rounded-full bg-white/70 backdrop-blur-md border border-white/50 shadow-lg shadow-pink-100/50 flex items-center justify-between"
         >
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
               <motion.img
-                src="/logo.png" // Ensure your logo is named logo.png in public folder
+                src="/logo.png"
                 alt="Cocoon"
                 className="h-10 w-auto relative z-10"
                 whileHover={{ rotate: 10, scale: 1.1 }}
@@ -61,7 +73,7 @@ export function Navigation() {
             </div>
           </Link>
 
-          {/* Desktop Links - The "Pill" Effect */}
+          {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1 bg-white/50 p-1 rounded-full border border-white/50">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -74,7 +86,7 @@ export function Navigation() {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className={`relative z-10 ${isActive ? "text-white" : "text-muted-foreground hover:text-primary"}`}>
+                  <span className="relative z-10 text-muted-foreground hover:text-primary" style={{ color: isActive ? 'white' : undefined }}>
                     {item.name}
                   </span>
                 </Link>
@@ -84,16 +96,50 @@ export function Navigation() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2.5 rounded-full bg-pink-50 text-primary border border-pink-100 hover:bg-primary hover:text-white transition-colors group"
-            >
-              <ShoppingBag size={20} />
-              <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-[10px] text-white flex items-center justify-center rounded-full border-2 border-white">
-                2
-              </span>
-            </motion.button>
+            
+            {/* Dynamic Auth Section (Desktop) */}
+            <div className="hidden md:flex items-center gap-3 mr-2">
+              {!isLoaded ? (
+                <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-full" />
+              ) : isSignedIn ? (
+                <div className="flex items-center gap-2 pl-4 pr-1 py-1 bg-white/50 rounded-full border border-white/50">
+                  <span className="text-sm font-medium text-gray-700">
+                    Hello, {user.firstName || user.username || "Princess"}
+                  </span>
+                  <UserButton afterSignOutUrl="/" appearance={{
+                    elements: { userButtonAvatarBox: "w-8 h-8" }
+                  }}/>
+                </div>
+              ) : (
+                <Link href="/login">
+                    <Button variant="ghost" className="rounded-full hover:bg-pink-50 text-primary font-semibold flex items-center gap-2">
+                      {/* ✅ Using the renamed component: UserIcon */}
+                      <UserIcon className="w-4 h-4" />
+                      Login
+                    </Button>
+                </Link>
+              )}
+            </div>
+
+
+            {/* Cart button */}
+            {isSignedIn && (
+              <Link href="/cart">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative p-2.5 rounded-full bg-pink-50 text-primary border border-pink-100 hover:bg-primary hover:text-white transition-colors group"
+                >
+                  <ShoppingBag size={20} />
+                  {cartItemCount > 0 && (
+                    <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 text-[10px] text-white flex items-center justify-center rounded-full border-2 border-white">
+                      {cartItemCount}
+                    </span>
+                  )}
+                </motion.button>
+              </Link>
+            )}
+
 
             {/* Mobile Menu Toggle */}
             <motion.button
@@ -150,18 +196,50 @@ export function Navigation() {
                   </Link>
                 </motion.div>
               ))}
+              
+              {/* Dynamic Auth Section (Mobile) */}
+               <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: navItems.length * 0.1 }}
+                  className="pt-6"
+                >
+                  {!isLoaded ? null : isSignedIn ? (
+                     <div className="flex flex-col items-center gap-4 p-4 bg-white/50 rounded-2xl">
+                         <span className="text-xl font-medium text-gray-700">
+                           Hello, {user.firstName || user.username}
+                         </span>
+                         <div onClick={() => setIsMobileMenuOpen(false)}>
+                            <UserButton afterSignOutUrl="/"/>
+                         </div>
+                     </div>
+                  ) : (
+                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button variant="outline" className="rounded-full px-8 py-6 text-lg border-primary text-primary hover:bg-pink-50 flex items-center gap-2">
+                           {/* ✅ Using the renamed component: UserIcon */}
+                           <UserIcon className="w-5 h-5" /> Login / Sign Up
+                        </Button>
+                     </Link>
+                  )}
+               </motion.div>
+
             </nav>
 
-            <motion.div 
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="mt-12"
-            >
-                <Button className="rounded-full px-8 py-6 text-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30">
-                    View Cart
-                </Button>
-            </motion.div>
+            {/* View Cart Button (Mobile) */}
+            {isSignedIn && (
+              <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-8 w-full max-w-xs"
+              >
+                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="rounded-full px-8 py-6 text-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30 w-full">
+                      View Cart {cartItemCount > 0 && `(${cartItemCount})`}
+                  </Button>
+                </Link>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
