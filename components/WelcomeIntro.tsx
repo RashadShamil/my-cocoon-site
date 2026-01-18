@@ -171,7 +171,7 @@ export function WelcomeIntro() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 4.2, duration: 1.5, ease: "easeOut" }}
               // Beautiful gradient text with a soft shadow for elegance
-              className="text-4xl md:text-6xl font-black text-center bg-gradient-to-r from-primary via-pink-500 to-accent bg-clip-text text-transparent drop-shadow-sm leading-tight tracking-tight pb-2"
+              className="text-4xl md:text-6xl font-black text-center bg-gradient-to-r from-primary via-pink-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm leading-tight tracking-tight pb-2"
             >
               Spreading Joy, Love & Style
             </motion.h1>
