@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 
 // === 1. The Custom Butterfly (Unchanged) ===
 const Butterfly = ({ size = 30, color = "#E879B9" }) => (
@@ -33,31 +33,42 @@ const Butterfly = ({ size = 30, color = "#E879B9" }) => (
 export function WelcomeIntro() {
   const [isVisible, setIsVisible] = useState(true);
   const [butterflies, setButterflies] = useState<any[]>([]);
+  const containerRef = useRef(null);
+
+  // ✅ PARALLAX SETUP for Desktop Intro
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+  // A subtle parallax effect for the intro background
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+
 
   useEffect(() => {
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = "hidden"; // Lock scroll
 
+    // Generate butterflies
     const width = window.innerWidth;
     const height = window.innerHeight;
-
-    const items = [...Array(30)].map((_, i) => ({
+    const items = [...Array(25)].map((_, i) => ({
       id: i,
       initialX: Math.random() > 0.5 ? -100 : width + 100,
       initialY: Math.random() * height,
-      pathX: Array.from({ length: 6 }, () => Math.random() * width),
-      pathY: Array.from({ length: 6 }, () => Math.random() * height),
-      rotate: Array.from({ length: 6 }, () => (Math.random() - 0.5) * 180),
+      pathX: Array.from({ length: 5 }, () => Math.random() * width),
+      pathY: Array.from({ length: 5 }, () => Math.random() * height),
+      rotate: Array.from({ length: 5 }, () => (Math.random() - 0.5) * 180),
       delay: Math.random() * 2,
-      duration: 5 + Math.random() * 5,
-      size: 15 + Math.random() * 45,
+      duration: 6 + Math.random() * 4,
+      size: 20 + Math.random() * 40,
       color: i % 2 === 0 ? "#E879B9" : "#FBCFE8",
     }));
     setButterflies(items);
 
+    // Shorter timer for a snappier intro (6 seconds total)
     const timer = setTimeout(() => {
       setIsVisible(false);
-      document.body.style.overflow = "auto";
-    }, 7000);
+      document.body.style.overflow = "auto"; // Unlock scroll
+    }, 6000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -66,121 +77,105 @@ export function WelcomeIntro() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
+          ref={containerRef}
           key="welcome-overlay"
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
-          exit={{ opacity: 0, transition: { duration: 1.5 } }}
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-pink-50"
+          exit={{ opacity: 0, transition: { duration: 1 } }}
         >
-          {/* ==================== LAYER 1: Background ==================== */}
-          <div className="absolute inset-0 bg-pink-50/50" />
+          
+          {/* ==================== LAYER 1: The Backgrounds ==================== */}
+          
+          {/* 1a. MOBILE STATIC BG */}
+          <div 
+            className="fixed inset-0 z-0 h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
+            style={{ filter: 'brightness(0.9)' }} // Slightly dim for text readability
+          />
+
+          {/* 1b. DESKTOP PARALLAX BG */}
+          <motion.div 
+            style={{ y }}
+            className="hidden md:block fixed inset-0 z-0 w-full h-[120vh]"
+          >
+             <img src="/banner-bg.jpg" alt="Welcome Background" className="w-full h-full object-cover brightness-90" />
+          </motion.div>
+          
+          {/* 1c. Aurora Blobs (On top of BG image) */}
           <motion.div
-            animate={{
-              x: [0, 100, -100, 0],
-              y: [0, -100, 100, 0],
-              scale: [1, 1.2, 1],
-            }}
+            animate={{ x: [0, 100, -100, 0], y: [0, -100, 100, 0], scale: [1, 1.2, 1] }}
             transition={{ duration: 20, repeat: Infinity, repeatType: "mirror" }}
-            className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-primary/20 rounded-full blur-[120px]"
+            className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] bg-primary/30 rounded-full blur-[150px] z-1"
           />
           <motion.div
-            animate={{
-              x: [0, -150, 50, 0],
-              y: [0, 50, -50, 0],
-              scale: [1, 1.3, 1],
-            }}
+            animate={{ x: [0, -150, 50, 0], y: [0, 50, -50, 0], scale: [1, 1.3, 1] }}
             transition={{ duration: 25, repeat: Infinity, repeatType: "mirror" }}
-            className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-accent/20 rounded-full blur-[120px]"
+            className="absolute bottom-[-20%] right-[-20%] w-[70vw] h-[70vw] bg-accent/30 rounded-full blur-[150px] z-1"
           />
-          <div className="absolute inset-0 backdrop-blur-3xl bg-white/30" />
 
           {/* ==================== LAYER 2: Butterflies ==================== */}
           {butterflies.map((b) => (
             <motion.div
               key={b.id}
-              className="absolute z-10"
+              className="absolute z-10 pointer-events-none"
               initial={{ x: b.initialX, y: b.initialY, opacity: 0, scale: 0 }}
               animate={{
-                x: b.pathX,
-                y: b.pathY,
-                rotate: b.rotate,
-                opacity: [0, 1, 1, 1, 0],
-                scale: [0, 1, 1, 0.5],
+                x: b.pathX, y: b.pathY, rotate: b.rotate,
+                opacity: [0, 1, 1, 1, 0], scale: [0, 1, 1, 0.5],
               }}
-              transition={{
-                duration: b.duration,
-                ease: "easeInOut",
-                delay: b.delay,
-              }}
+              transition={{ duration: b.duration, ease: "easeInOut", delay: b.delay }}
             >
               <Butterfly size={b.size} color={b.color} />
             </motion.div>
           ))}
 
-          {/* ==================== LAYER 3: Content (Logo & Tagline) ==================== */}
-          <div className="relative z-20 text-center px-4 flex flex-col items-center">
-            {/* Glow behind logo */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 2 }}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-white/80 rounded-full blur-[100px] -z-10"
-            />
+          {/* ==================== LAYER 3: Content Card ==================== */}
+          {/* A beautiful frosted glass box to hold the content */}
+          <motion.div 
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+             className="relative z-20 flex flex-col items-center p-12 rounded-[3rem] bg-white/40 backdrop-blur-xl border border-white/50 shadow-2xl mx-4 max-w-2xl"
+          >
+          
 
-
-            {/* LOGO REPLACEMENT & ANIMATION */}
+            {/* LOGO & FLOATING ANIMATION */}
             <motion.div
               initial={{ scale: 0.5, opacity: 0, filter: "blur(15px)" }}
               animate={{ 
-                  scale: 1, 
-                  opacity: 1, 
-                  filter: "blur(0px)",
-                  // Add a subtle floating effect after it appears
-                  y: [0, -15, 0]
+                  scale: 1, opacity: 1, filter: "blur(0px)",
+                  y: [0, -15, 0] // Floating effect
               }}
               transition={{ 
-                  // Entrance animation
-                  delay: 1.2, 
-                  duration: 1.8, 
-                  type: "spring", 
-                  bounce: 0.4,
-                  // Floating animation
-                  y: {
-                      delay: 3, // Wait for entrance to finish
-                      duration: 4,
-                      repeat: Infinity,
-                      repeatType: "mirror",
-                      ease: "easeInOut"
-                  }
+                  delay: 2.2, duration: 1.5, type: "spring", bounce: 0.4,
+                  y: { delay: 3.7, duration: 4, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }
               }}
-              className="mb-8 relative"
+              className="mb-10 relative"
             >
-               {/* ⚠️ MAKE SURE public/logo.png EXISTS */}
                <img 
                   src="/logo.png" 
                   alt="Cocoon Kids Logo" 
-                  // Adjusted size for impact. Change w-64/h-64 if needed.
-                  className="w-48 h-48 md:w-64 md:h-64 object-contain drop-shadow-xl"
+                  className="w-56 h-56 md:w-72 md:h-72 object-contain drop-shadow-xl"
                />
             </motion.div>
 
-            {/* Separator Line */}
+            {/* SEPARATOR LINE */}
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "120px", opacity: 1 }}
-              transition={{ delay: 2.8, duration: 1.2, ease: "easeOut" }}
-              className="h-1.5 bg-gradient-to-r from-primary/40 via-pink-400/60 to-accent/40 mx-auto mb-8 rounded-full"
+              animate={{ width: "140px", opacity: 1 }}
+              transition={{ delay: 3.5, duration: 1.2, ease: "easeOut" }}
+              className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-8 rounded-full"
             />
 
-            {/* ✅ TAGLINE RESTYLING FOR CLARITY */}
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 3.5, duration: 1.5, ease: "easeOut" }}
-              // Changed to solid dark text with a stronger shadow for maximum readability
-              className="text-3xl md:text-5xl font-bold text-foreground drop-shadow-md tracking-wide pb-2"
+            {/* ✅ NEW GORGEOUS TAGLINE */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 4.2, duration: 1.5, ease: "easeOut" }}
+              // Beautiful gradient text with a soft shadow for elegance
+              className="text-4xl md:text-6xl font-black text-center bg-gradient-to-r from-primary via-pink-500 to-accent bg-clip-text text-transparent drop-shadow-sm leading-tight tracking-tight pb-2"
             >
-              Spreading Joy, Love and Style
-            </motion.h2>
-          </div>
+              Spreading Joy, Love & Style
+            </motion.h1>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
