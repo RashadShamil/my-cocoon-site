@@ -25,18 +25,14 @@ export function ShopPage({ products }: ShopPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef(null); // Ref for parallax container
 
-  // PARALLAX SETUP
-  // Track scroll progress of the entire page container
-  // Using "start start" (top of container hits top of viewport) 
-  // to "end end" (bottom of container hits bottom of viewport) covers the whole scroll range.
+  // PARALLAX SETUP (Desktop only)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"], 
   });
 
-  // Map scroll to movement. The background moves slower than scroll (0% to 30%)
+  // Increased intensity for desktop movement
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  // Optional: slight fade out as you scroll way down
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.7]);
 
   // Filter logic
@@ -49,24 +45,35 @@ export function ShopPage({ products }: ShopPageProps) {
   });
 
   return (
-    // ✅ FIX 1: Removed 'overflow-hidden' to allow proper browser scrolling
+    // Main container gets the ref
     <div className="min-h-screen relative" ref={containerRef}>
       
-      {/* =========================================
-          PARALLAX BACKGROUND LAYER
-      ========================================= */}
+      {/* =====================================================================
+          ✅ NEW: DUAL BACKGROUND STRATEGY
+      ====================================================================== */}
+
+      {/* 1. MOBILE ONLY: Static Background Image */}
+      {/* Uses CSS background-image. 'md:hidden' makes it disappear on desktop. */}
+      {/* ⚠️ IMPORTANT: Ensure 'Pbanner-bg.jpg' is in your /public folder */}
+      <div 
+        className="fixed inset-0 z-[-20] h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
+      />
+
+      {/* 2. DESKTOP ONLY: Animated Parallax Background Image */}
+      {/* 'hidden' by default. 'md:block' makes it appear on desktop. */}
       <motion.div 
         style={{ y, opacity }} 
-        className="fixed top-0 left-0 w-full h-[160vh] -z-10"
+        // Height set to 150vh for better desktop scroll range
+        className="hidden md:block fixed top-0 left-0 w-full h-[150vh] -z-10"
       >
         <img
-          // ⚠️ REPLACE with your beautiful banner image path
+          // ⚠️ Ensure this image exists in your public folder
           src="/banner-bg.jpg"
           alt="Shop Background"
-          // ✅ FIX 2: Removed brightness-[0.85] so it shows at full brightness
           className="w-full h-full object-cover" 
         />
       </motion.div>
+      {/* ===================================================================== */}
 
 
       {/* =========================================

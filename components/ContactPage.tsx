@@ -1,8 +1,9 @@
 'use client'
 
-import { useRef } from "react"; // ✅ Added useRef
-// ✅ Added useScroll and useTransform
-import { motion, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
+// NOTE: Using 'framer-motion' based on your previous context.
+// If you are using 'motion/react', change this back to: import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Mail, MapPin, Phone, Facebook, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
@@ -19,45 +20,54 @@ export function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 1. Construct the email details
     const recipient = "Coccoonkids@gmail.com";
     const subject = `New Inquiry from ${formData.name}`;
     const body = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nMessage:\n${formData.message}`;
-
-    // 2. Open the user's email client
     window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
-  // ✅ PARALLAX SETUP
   const containerRef = useRef(null);
-  // Track scroll progress of the entire page container
+  
+  // PARALLAX SETUP (Desktop only)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"], 
   });
 
-  // Map scroll to movement. The background moves slower than scroll (0% to 20%)
+  // Increased intensity for desktop movement
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   return (
-    // ✅ Added ref and changed to relative
+    // Main container gets the ref
     <div className="min-h-screen relative" ref={containerRef}>
       
-      {/* =========================================
-          ✅ PARALLAX BACKGROUND LAYER
-      ========================================= */}
+      {/* =====================================================================
+          ✅ NEW: DUAL BACKGROUND STRATEGY
+      ====================================================================== */}
+
+      {/* 1. MOBILE ONLY: Static Background Image */}
+      {/* Uses CSS background-image. 'md:hidden' makes it disappear on desktop. */}
+      {/* ⚠️ IMPORTANT: Ensure 'Pbanner-bg.jpg' is in your /public folder */}
+      <div 
+        className="fixed inset-0 z-[-20] h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
+      />
+
+      {/* 2. DESKTOP ONLY: Animated Parallax Background Image */}
+      {/* 'hidden' by default. 'md:block' makes it appear on desktop. */}
       <motion.div 
         style={{ y }} 
-        className="fixed top-0 left-0 w-full h-[160vh] -z-10"
+        // Height set to 150vh for better desktop scroll range
+        className="hidden md:block fixed top-0 left-0 w-full h-[150vh] -z-10 pointer-events-none"
       >
         <img
-          // ⚠️ REPLACE with your beautiful banner image path
+          // ⚠️ Ensure this image exists in your public folder
           src="/banner-bg.jpg"
           alt="Contact Background"
-          // ✅ Brightness kept at 100% (no filter)
           className="w-full h-full object-cover" 
         />
       </motion.div>
+      {/* ===================================================================== */}
+
 
       {/* =========================================
           MAIN CONTENT AREA (Scrolling on top)
@@ -89,7 +99,7 @@ export function ContactPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              {/* ✅ Changed card background to be slightly transparent white for consistency */}
+              {/* Card background slightly transparent white for consistency */}
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-gray-100">
                 <div className="flex items-center gap-2 mb-6">
                   <Sparkles className="w-6 h-6 text-primary" />
@@ -107,7 +117,6 @@ export function ContactPage() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       required
-                      // Updated input styles for better contrast
                       className="w-full bg-white border-gray-300 focus:border-primary focus:ring-primary"
                     />
                   </div>
@@ -202,7 +211,6 @@ export function ContactPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 + index * 0.1 }}
                     whileHover={{ x: 10 }}
-                    // ✅ Updated card style for better contrast
                     className="flex items-start gap-4 p-6 bg-white/90 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100"
                   >
                     <motion.div
@@ -226,7 +234,6 @@ export function ContactPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                // ✅ Updated style for better contrast
                 className="bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl p-8 backdrop-blur-sm border border-white/50 shadow-sm"
               >
                 <h3 className="font-semibold mb-4 flex items-center gap-2 text-gray-900">

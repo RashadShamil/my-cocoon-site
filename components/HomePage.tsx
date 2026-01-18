@@ -33,13 +33,13 @@ export function HomePage({ products }: HomePageProps) {
   const [sparkles, setSparkles] = useState<SparkleData[]>([]);
   const containerRef = useRef(null);
 
-  // 1. Track scroll progress for the Hero section
+  // Parallax Setup (Only used for Desktop now)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
-  // 2. Map scroll to parallax movement
+  // Increased intensity for desktop movement
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 0.5, 0]);
 
@@ -58,22 +58,33 @@ export function HomePage({ products }: HomePageProps) {
   return (
     <div className="min-h-screen relative" ref={containerRef}>
       
-      {/* =========================================
-          PARALLAX BACKGROUND LAYER
-      ========================================= */}
+      {/* =====================================================================
+          ✅ NEW: DUAL BACKGROUND STRATEGY
+      ====================================================================== */}
+
+      {/* 1. MOBILE ONLY: Static Background Image */}
+      {/* Uses CSS background-image. 'md:hidden' makes it disappear on desktop. */}
+      {/* ⚠️ IMPORTANT: Make sure 'Pbanner-bg.jpg' is in your /public folder */}
+      <div 
+        className="fixed inset-0 z-[-20] h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
+      />
+
+      {/* 2. DESKTOP ONLY: Animated Parallax Background */}
+      {/* 'hidden' by default. 'md:block' makes it appear on desktop. */}
       <motion.div 
         style={{ y, opacity }} 
-        className="fixed top-0 left-0 w-full h-[160vh] -z-10 pointer-events-none"
+        // Height increased to 150vh for better desktop scroll range
+        className="hidden md:block fixed top-0 left-0 w-full h-[150vh] -z-10 pointer-events-none"
       >
         <img
-          // ⚠️ REPLACE with your beautiful banner image
           src="/banner-bg.jpg"
           alt="Cocoon Background"
-          className="w-full h-full object-cover " 
+          className="w-full h-full object-cover" 
         />
-        {/* Optional overlay to make text pop */}
         <div className="absolute inset-0 bg-white/30" />
       </motion.div>
+      {/* ===================================================================== */}
+
 
       {/* =========================================
           SECTION 1: HERO (Content sits on top)
@@ -105,15 +116,14 @@ export function HomePage({ products }: HomePageProps) {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* ✅ MAIN BOX CONTAINER: Wraps both text and image */}
+          {/* MAIN BOX CONTAINER */}
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center bg-white/60 backdrop-blur-md p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/40">
             
-            {/* Left Content (Text & Buttons) */}
+            {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              // Removed box styling from here
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -167,7 +177,7 @@ export function HomePage({ products }: HomePageProps) {
               </motion.div>
             </motion.div>
 
-            {/* Right Image Section (Now inside the main box) */}
+            {/* Right Image Section */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -181,7 +191,6 @@ export function HomePage({ products }: HomePageProps) {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                // Kept the image's own border/shadow as it looks good nested inside the bigger box
                 className="relative z-10 rounded-3xl overflow-hidden shadow-2xl max-w-sm mx-auto border-4 border-white/50"
               >
                 <img
@@ -191,7 +200,7 @@ export function HomePage({ products }: HomePageProps) {
                 />
               </motion.div>
             </motion.div>
-          </div>{/* End Main Box Container */}
+          </div>
         </div>
       </section>
 

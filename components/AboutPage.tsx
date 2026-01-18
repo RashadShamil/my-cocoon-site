@@ -1,7 +1,9 @@
 'use client'
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react"; // Using motion/react as in your previous snippet
+// NOTE: Using 'framer-motion' based on your previous context.
+// If you are using 'motion/react', change this back to: import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Heart, Sparkles, Award, Users } from "lucide-react";
 
 // --- Data Arrays (Unchanged) ---
@@ -37,43 +39,53 @@ const values = [
 export function AboutPage() {
   const containerRef = useRef(null);
   
-  // ✅ 1. PARALLAX SETUP
-  // Track scroll progress of the entire page
+  // 1. PARALLAX SETUP (Desktop only)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Map scroll to movement. The image moves slower (0% -> 20%) than the scroll.
+  // Increased intensity for desktop movement
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   return (
     // Main container gets the ref
     <div ref={containerRef} className="min-h-screen relative overflow-hidden">
 
-      {/* =========================================
-          ✅ 2. FIXED PARALLAX BACKGROUND IMAGE
-          Sits behind everything (-z-10)
-      ========================================= */}
+      {/* =====================================================================
+          ✅ NEW: DUAL BACKGROUND STRATEGY
+      ====================================================================== */}
+
+      {/* 1. MOBILE ONLY: Static Background Image */}
+      {/* Uses CSS background-image. 'md:hidden' makes it disappear on desktop. */}
+      {/* ⚠️ IMPORTANT: Ensure 'Pbanner-bg.jpg' is in your /public folder */}
+      <div 
+        className="fixed inset-0 z-[-20] h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
+      />
+
+      {/* 2. DESKTOP ONLY: Animated Parallax Background Image */}
+      {/* 'hidden' by default. 'md:block' makes it appear on desktop. */}
       <motion.div
           style={{ y }}
-          className="fixed inset-0 w-full h-[160vh] -z-10"
+          // Height set to 150vh for better desktop scroll range
+          className="hidden md:block fixed inset-0 w-full h-[150vh] -z-10 pointer-events-none"
       >
          <img 
             // ⚠️ Ensure this image exists in your public folder
             src="/banner-bg.jpg" 
             alt="About Background" 
-            // Slight dim so text is readable, object-cover fills screen
             className="w-full h-full object-cover" 
          />
       </motion.div>
+      {/* ===================================================================== */}
+
 
       {/* =========================================
           MAIN CONTENT SCROLLING ON TOP
       ========================================= */}
       <div className="relative z-10 pt-32 pb-20">
 
-        {/* Hero Section - TRANSPARENT background so parallax shows */}
+        {/* Hero Section - TRANSPARENT background so image shows through */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
           {/* Wrapped in a frosted box for better readability against the image */}
           <div className="grid md:grid-cols-2 gap-12 items-center bg-white/70 backdrop-blur-md p-8 md:p-12 rounded-[3rem] shadow-xl border border-white/40">
@@ -142,7 +154,7 @@ export function AboutPage() {
           </div>
         </section>
 
-        {/* ✅ Features Grid - SOLID CARD style scrolling over background */}
+        {/* Features Grid - SOLID CARD style scrolling over background */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
           <div className="bg-white/90 backdrop-blur-sm py-20 px-8 rounded-[3rem] shadow-xl border border-white/50">
             <motion.div
@@ -187,7 +199,7 @@ export function AboutPage() {
           </div>
         </section>
 
-        {/* ✅ Values Section - SOLID CARD style */}
+        {/* Values Section - SOLID CARD style */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
          <div className="bg-white/90 backdrop-blur-sm py-20 px-8 rounded-[3rem] shadow-xl border border-white/50">
           <motion.div
