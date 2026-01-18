@@ -1,7 +1,9 @@
 "use client";
 
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+// ✅ Removed useScroll, useTransform
+import { motion, AnimatePresence } from "framer-motion";
+// ✅ Removed useRef
+import { useEffect, useState } from "react";
 
 // === 1. The Custom Butterfly (Unchanged) ===
 const Butterfly = ({ size = 30, color = "#E879B9" }) => (
@@ -33,16 +35,7 @@ const Butterfly = ({ size = 30, color = "#E879B9" }) => (
 export function WelcomeIntro() {
   const [isVisible, setIsVisible] = useState(true);
   const [butterflies, setButterflies] = useState<any[]>([]);
-  const containerRef = useRef(null);
-
-  // ✅ PARALLAX SETUP for Desktop Intro
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-  // A subtle parallax effect for the intro background
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-
+  // ✅ Removed containerRef, scrollYProgress, and y
 
   useEffect(() => {
     document.body.style.overflow = "hidden"; // Lock scroll
@@ -77,7 +70,7 @@ export function WelcomeIntro() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          ref={containerRef}
+          // ✅ Removed ref={containerRef}
           key="welcome-overlay"
           className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-pink-50"
           exit={{ opacity: 0, transition: { duration: 1 } }}
@@ -87,16 +80,22 @@ export function WelcomeIntro() {
           
           {/* 1a. MOBILE STATIC BG */}
           <div 
-            className="fixed inset-0 z-0 h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
+            // ✅ Kept z-index -1
+            className="fixed inset-0 z-[-1] h-full w-full bg-[url('/Pbanner-bg.jpg')] bg-cover bg-center bg-no-repeat md:hidden"
             style={{ filter: 'brightness(0.9)' }} // Slightly dim for text readability
           />
 
-          {/* 1b. DESKTOP PARALLAX BG */}
+          {/* 1b. DESKTOP BG (Removed parallax style) */}
           <motion.div 
-            style={{ y }}
+            // ✅ Removed style={{ y }}
             className="hidden md:block fixed inset-0 z-0 w-full h-[120vh]"
           >
-             <img src="/banner-bg.jpg" alt="Welcome Background" className="w-full h-full object-cover brightness-90" />
+              {/* ✅ Kept 'object-top' */}
+             <img 
+               src="/dbanner-bg.jpg" 
+               alt="Welcome Background" 
+               className="w-full h-full object-cover object-top brightness-90" 
+             />
           </motion.div>
           
           {/* 1c. Aurora Blobs (On top of BG image) */}
@@ -135,7 +134,7 @@ export function WelcomeIntro() {
              transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
              className="relative z-20 flex flex-col items-center p-12 rounded-[3rem] bg-white/40 backdrop-blur-xl border border-white/50 shadow-2xl mx-4 max-w-2xl"
           >
-          
+            
 
             {/* LOGO & FLOATING ANIMATION */}
             <motion.div
