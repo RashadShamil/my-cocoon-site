@@ -1,9 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-// ✅ THE FIX: We rename 'User' to 'UserIcon' right here in the import.
-// If 'User' is red here, please try the 'npm i lucide-react@latest' step above.
-import { ShoppingBag, Menu, X, Heart, Sparkles, User as UserIcon } from "lucide-react";
+// ✅ CHANGED: Removed 'User' from here. Other icons stay normal.
+import { ShoppingBag, Menu, X, Heart, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,13 +10,31 @@ import { Button } from "@/components/button";
 // Import Clerk hooks and components
 import { useUser, UserButton } from "@clerk/nextjs";
 
+// ✅ BRUTE FORCE FIX: Inline User Icon
+const UserIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    {...props}
+  >
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   
   // Get user data from Clerk
-  // ✅ Because we renamed the icon in the imports, this 'user' variable is safe to use.
   const { isSignedIn, user, isLoaded } = useUser();
 
   // --- CART STATE PLACEHOLDER ---
@@ -113,7 +130,7 @@ export function Navigation() {
               ) : (
                 <Link href="/login">
                     <Button variant="ghost" className="rounded-full hover:bg-pink-50 text-primary font-semibold flex items-center gap-2">
-                      {/* ✅ Using the renamed component: UserIcon */}
+                      {/* ✅ Using the inline UserIcon component */}
                       <UserIcon className="w-4 h-4" />
                       Login
                     </Button>
@@ -216,7 +233,7 @@ export function Navigation() {
                   ) : (
                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
                         <Button variant="outline" className="rounded-full px-8 py-6 text-lg border-primary text-primary hover:bg-pink-50 flex items-center gap-2">
-                           {/* ✅ Using the renamed component: UserIcon */}
+                           {/* ✅ Using the inline UserIcon component */}
                            <UserIcon className="w-5 h-5" /> Login / Sign Up
                         </Button>
                      </Link>
