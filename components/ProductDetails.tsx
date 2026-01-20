@@ -2,8 +2,6 @@
 
 import { useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-// ✅ Removed Minus, Plus, Upload from here
-import { Star, MapPin, Mail, ShoppingCart } from "lucide-react"; 
 import { Button } from "@/components/button";
 import { urlFor } from "@/sanity/lib/image";
 import { useCart } from "@/context/CartContext"; 
@@ -11,15 +9,16 @@ import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-// --- INLINE ICONS (Brute Forced) ---
+// --- 🛠️ BRUTE FORCE ICONS (Inline SVGs) ---
 const TruckIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>);
 const ShieldCheckIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>);
 const MessageCircle = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>);
-
-// ✅ NEW Brute Forced Icons
 const MinusIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14" /></svg>);
 const PlusIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14" /><path d="M12 5v14" /></svg>);
 const UploadIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>);
+const StarIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>);
+const ShoppingCartIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>);
+const MailIcon = (props: any) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>);
 
 interface Review {
   _id: string;
@@ -63,7 +62,7 @@ export default function ProductDetails({ product }: ProductProps) {
   const [reviewList, setReviewList] = useState<Review[]>(product.reviews || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { addToCart } = useCart();
+  const { addToCart, triggerFlyingAnimation } = useCart();
   const { isSignedIn } = useUser();
   const router = useRouter();
 
@@ -80,7 +79,7 @@ export default function ProductDetails({ product }: ProductProps) {
     if (price) setCurrentPrice(price);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!isSignedIn) {
       router.push("/login");
       return;
@@ -89,6 +88,18 @@ export default function ProductDetails({ product }: ProductProps) {
       alert("Please select a size first!");
       return;
     }
+
+    const buttonRect = e.currentTarget.getBoundingClientRect();
+    triggerFlyingAnimation({
+        imageUrl: product.imageUrl,
+        startRect: {
+            x: buttonRect.left,
+            y: buttonRect.top,
+            width: buttonRect.width,
+            height: buttonRect.height
+        }
+    });
+
     for(let i = 0; i < quantity; i++) {
         addToCart({
             _id: product._id,
@@ -97,7 +108,6 @@ export default function ProductDetails({ product }: ProductProps) {
             imageUrl: product.imageUrl,
         }, selectedSize || "Standard");
     }
-    alert("Added to cart!");
   };
 
   const handleWhatsAppBuy = () => {
@@ -111,7 +121,6 @@ export default function ProductDetails({ product }: ProductProps) {
     window.open(url, "_blank");
   };
 
-  // REAL REVIEW SUBMISSION LOGIC
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSignedIn) {
@@ -190,7 +199,12 @@ export default function ProductDetails({ product }: ProductProps) {
               {allImages.length > 1 && (
                 <div className="flex gap-4 overflow-x-auto pb-2">
                   {allImages.map((img, index) => (
-                    <button key={index} onClick={() => setMainImage(img)} className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${mainImage === img ? "border-primary scale-105" : "border-transparent hover:border-pink-300"}`}>
+                    <button 
+                      key={index} 
+                      onClick={() => setMainImage(img)} 
+                      suppressHydrationWarning={true} // ✅ Suppress warning
+                      className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${mainImage === img ? "border-primary scale-105" : "border-transparent hover:border-pink-300"}`}
+                    >
                       <Image src={urlFor(img).url()} alt={`View ${index}`} fill className="object-cover" />
                     </button>
                   ))}
@@ -204,7 +218,7 @@ export default function ProductDetails({ product }: ProductProps) {
                 <div className="flex items-center justify-between mb-2">
                     <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">{product.category}</span>
                     <div className="flex items-center gap-1 text-yellow-500 text-sm font-bold bg-yellow-50 px-2 py-1 rounded-lg">
-                        <Star className="w-4 h-4 fill-current" /> {averageRating}
+                        <StarIcon className="w-4 h-4 fill-current" /> {averageRating}
                     </div>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 mb-2">{product.name}</h1>
@@ -218,7 +232,12 @@ export default function ProductDetails({ product }: ProductProps) {
                   <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Select Size</h3>
                   <div className="flex flex-wrap gap-3">
                     {product.sizeOptions.map((option, index) => (
-                      <button key={index} onClick={() => handleSizeSelect(option.size, option.price)} className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 font-medium ${selectedSize === option.size ? "border-primary bg-primary/5 text-primary scale-105 shadow-md" : "border-gray-200 text-gray-600 hover:border-primary/50 bg-white"}`}>
+                      <button 
+                        key={index} 
+                        onClick={() => handleSizeSelect(option.size, option.price)} 
+                        suppressHydrationWarning={true} // ✅ Suppress warning
+                        className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 font-medium ${selectedSize === option.size ? "border-primary bg-primary/5 text-primary scale-105 shadow-md" : "border-gray-200 text-gray-600 hover:border-primary/50 bg-white"}`}
+                      >
                         <span className="block text-sm font-bold">{option.size}</span>
                         <span className="block text-xs opacity-70">Rs. {option.price}</span>
                       </button>
@@ -227,21 +246,46 @@ export default function ProductDetails({ product }: ProductProps) {
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white">
-                      {/* ✅ Used MinusIcon */}
-                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 hover:bg-gray-50 text-gray-600"><MinusIcon className="w-5 h-5"/></button>
-                      <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                      {/* ✅ Used PlusIcon */}
-                      <button onClick={() => setQuantity(quantity + 1)} className="p-3 hover:bg-gray-50 text-gray-600"><PlusIcon className="w-5 h-5"/></button>
+              {/* Actions Row */}
+              <div className="flex gap-3 mb-4">
+                  {/* Quantity */}
+                  <div className="flex items-center border border-gray-300 rounded-xl bg-gray-50 h-14 shrink-0">
+                      <button 
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))} 
+                        className="px-3 h-full hover:bg-gray-200 text-gray-600 rounded-l-xl transition-colors"
+                        suppressHydrationWarning={true} // ✅ Suppress warning
+                      >
+                          <MinusIcon className="w-4 h-4"/>
+                      </button>
+                      <span className="w-10 text-center font-bold text-gray-900 text-lg">{quantity}</span>
+                      <button 
+                        onClick={() => setQuantity(quantity + 1)} 
+                        className="px-3 h-full hover:bg-gray-200 text-gray-600 rounded-r-xl transition-colors"
+                        suppressHydrationWarning={true} // ✅ Suppress warning
+                      >
+                          <PlusIcon className="w-4 h-4"/>
+                      </button>
                   </div>
-                  <Button size="lg" onClick={handleAddToCart} className="flex-1 py-6 text-lg bg-gray-900 hover:bg-black text-white shadow-lg rounded-xl">
-                      <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+
+                  {/* Add to Cart */}
+                  <Button 
+                    onClick={handleAddToCart} 
+                    className="flex-1 h-14 bg-gray-900 hover:bg-black text-white shadow-md rounded-xl text-base font-semibold"
+                    // @ts-ignore
+                    suppressHydrationWarning={true}
+                  >
+                      <ShoppingCartIcon className="mr-2 h-5 w-5" /> Add to Cart
                   </Button>
               </div>
 
-              <Button size="lg" onClick={handleWhatsAppBuy} className="w-full py-6 text-lg bg-[#25D366] hover:bg-[#128C7E] text-white mb-8 transition-colors shadow-lg hover:shadow-xl rounded-xl">
-                <Mail className="mr-2 h-6 w-6" /> Order on WhatsApp
+              {/* WhatsApp Button */}
+              <Button 
+                onClick={handleWhatsAppBuy} 
+                className="w-full h-14 bg-[#25D366] hover:bg-[#128C7E] text-white mb-8 transition-colors shadow-md hover:shadow-lg rounded-xl text-base font-semibold"
+                // @ts-ignore
+                suppressHydrationWarning={true}
+              >
+                <MailIcon className="mr-2 h-5 w-5" /> Order on WhatsApp
               </Button>
 
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 bg-gray-50 p-4 rounded-xl border border-gray-100">
@@ -261,7 +305,7 @@ export default function ProductDetails({ product }: ProductProps) {
                 <div className="text-right">
                     <span className="text-4xl font-bold text-primary">{averageRating}</span>
                     <div className="flex text-yellow-400 text-sm justify-end">
-                       {[...Array(5)].map((_,i) => (<Star key={i} className={`w-4 h-4 ${i < Math.round(Number(averageRating)) ? "fill-current" : "text-gray-200"}`} />))}
+                       {[...Array(5)].map((_,i) => (<StarIcon key={i} className={`w-4 h-4 ${i < Math.round(Number(averageRating)) ? "fill-current" : "text-gray-200"}`} />))}
                     </div>
                     <span className="text-sm text-gray-400">{reviewList.length} ratings</span>
                 </div>
@@ -277,22 +321,47 @@ export default function ProductDetails({ product }: ProductProps) {
                                 <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Your Rating</label>
                                 <div className="flex gap-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
-                                <button type="button" key={star} onClick={() => setReviewRating(star)}>
-                                    <Star className={`w-8 h-8 transition-colors ${star <= reviewRating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
+                                <button 
+                                  key={star} 
+                                  type="button" 
+                                  onClick={() => setReviewRating(star)} 
+                                  suppressHydrationWarning={true} // ✅ Suppress warning
+                                >
+                                    <StarIcon className={`w-8 h-8 transition-colors ${star <= reviewRating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
                                 </button>
                                 ))}
                                 </div>
                             </div>
-                            <input type="text" placeholder="Your Name" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:bg-white transition-all" value={reviewName} onChange={(e) => setReviewName(e.target.value)} required />
+                            <input 
+                                type="text" 
+                                placeholder="Your Name" 
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:bg-white transition-all" 
+                                value={reviewName} 
+                                onChange={(e) => setReviewName(e.target.value)} 
+                                required 
+                                suppressHydrationWarning={true} // ✅ Suppress warning
+                            />
                             <div className="relative group">
                                 <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full z-10" />
                                 <div className="w-full bg-gray-50 border border-gray-200 border-dashed rounded-xl px-4 py-4 text-gray-500 flex flex-col items-center justify-center gap-2 group-hover:bg-white group-hover:border-primary transition-all">
-                                    {/* ✅ Used UploadIcon */}
                                     <UploadIcon className="w-6 h-6 text-primary" /> <span className="text-sm">Click to upload a photo</span>
                                 </div>
                             </div>
-                            <textarea placeholder="Tell us what you think..." rows={4} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:bg-white transition-all resize-none" value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} required />
-                            <Button disabled={isSubmitting} className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-4 font-bold text-lg shadow-lg shadow-pink-200/50">
+                            <textarea 
+                                placeholder="Tell us what you think..." 
+                                rows={4} 
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:bg-white transition-all resize-none" 
+                                value={reviewComment} 
+                                onChange={(e) => setReviewComment(e.target.value)} 
+                                required 
+                                suppressHydrationWarning={true} // ✅ Suppress warning
+                            />
+                            <Button 
+                                disabled={isSubmitting} 
+                                className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-4 font-bold text-lg shadow-lg shadow-pink-200/50"
+                                // @ts-ignore
+                                suppressHydrationWarning={true}
+                            >
                                 {isSubmitting ? "Submitting..." : "Submit Review"}
                             </Button>
                         </form>
@@ -317,7 +386,7 @@ export default function ProductDetails({ product }: ProductProps) {
                                     <div>
                                         <h4 className="font-bold text-gray-900">{review.name}</h4>
                                         <div className="flex text-yellow-400 text-xs">
-                                            {[...Array(5)].map((_, i) => (<Star key={i} className={`w-3 h-3 ${i < review.rating ? "fill-current" : "text-gray-200"}`} />))}
+                                            {[...Array(5)].map((_, i) => (<StarIcon key={i} className={`w-3 h-3 ${i < review.rating ? "fill-current" : "text-gray-200"}`} />))}
                                         </div>
                                     </div>
                                 </div>

@@ -1,14 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-// ✅ REMOVED: import { Heart, Filter, Search, ShoppingCart, MessageCircle, X, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/button";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 import { useCart } from "@/context/CartContext";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 
 // --- 🛠️ BRUTE FORCE ICONS (Inline SVGs) ---
 const HeartIcon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>;
@@ -17,8 +14,6 @@ const SearchIcon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width
 const CartIcon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>;
 const XIcon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>;
 const StarIcon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>;
-
-// ✅ REQUESTED ICONS
 const MessageCircleIcon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg>;
 const Trash2Icon = (props: any) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>;
 // ---------------------------------------------
@@ -41,9 +36,8 @@ export function ShopPage({ products }: ShopPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef(null);
 
-  const { addToCart, cart, removeFromCart, cartTotal, isCartOpen, toggleCart, cartCount } = useCart();
-  const { isSignedIn } = useUser();
-  const router = useRouter();
+  // Hook into our Cart Context (Kept for the Sidebar functionality)
+  const { cart, removeFromCart, cartTotal, isCartOpen, toggleCart, cartCount } = useCart();
 
   // PARALLAX SETUP
   const { scrollYProgress } = useScroll({
@@ -62,18 +56,10 @@ export function ShopPage({ products }: ShopPageProps) {
     return matchesCategory && matchesSearch;
   });
 
+  // WhatsApp Helper
   const handleWhatsApp = (productName: string) => {
     const message = `Hi! I'm interested in buying the ${productName}. Is it available?`;
     window.open(`https://wa.me/94771234567?text=${encodeURIComponent(message)}`, '_blank');
-  };
-
-  const handleQuickAdd = (product: Product) => {
-    if (!isSignedIn) {
-      router.push("/login");
-      return;
-    }
-    addToCart(product, "Standard");
-    alert("Added to cart!");
   };
 
   return (
@@ -137,7 +123,6 @@ export function ShopPage({ products }: ShopPageProps) {
                         <p className="text-primary font-bold">Rs. {item.price * item.quantity}</p>
                       </div>
                       <button onClick={() => removeFromCart(item._id)} className="text-red-400 hover:text-red-600">
-                        {/* ✅ USING BRUTE FORCED ICON */}
                         <Trash2Icon className="w-5 h-5" />
                       </button>
                     </div>
@@ -241,7 +226,6 @@ export function ShopPage({ products }: ShopPageProps) {
                             className="p-2 bg-green-500 rounded-full shadow-md z-10 text-white hover:bg-green-600"
                             title="Chat on WhatsApp"
                           >
-                            {/* ✅ USING BRUTE FORCED ICON */}
                             <MessageCircleIcon className="w-4 h-4" />
                           </motion.button>
                     </div>
@@ -264,13 +248,16 @@ export function ShopPage({ products }: ShopPageProps) {
 
                         <div className="flex items-center justify-between mt-2">
                           <p className="text-primary font-bold text-lg">Rs. {product.price}</p>
-                          <Button 
-                            onClick={() => handleQuickAdd(product)}
-                            size="sm" 
-                            className="bg-gray-900 text-white hover:bg-primary rounded-lg text-xs px-3"
-                          >
-                            Add +
-                          </Button>
+                          
+                          {/* ✅ REPLACED "Add +" BUTTON WITH "View" LINK */}
+                          <Link href={`/product/${product.slug}`}>
+                            <Button 
+                              size="sm" 
+                              className="bg-gray-900 text-white hover:bg-primary rounded-lg text-xs px-3"
+                            >
+                              View
+                            </Button>
+                          </Link>
                         </div>
                     </div>
 
