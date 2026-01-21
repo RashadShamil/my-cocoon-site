@@ -17,7 +17,7 @@ export function Footer() {
       return;
     }
 
-    const recipient = "Coccoonkids@gmail.com";
+    const recipient = "Cocoonkidssl@gmail.com";
     const subject = "Newsletter Subscription Request";
     const body = `Hi Cocoon Kids,\n\nPlease add my email (${email}) to your newsletter list for exclusive offers!\n\nThank you!`;
 
@@ -183,7 +183,7 @@ export function Footer() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={16} className="text-primary" />
-                  <span>Coccoonkids@gmail.com</span> {/* Updated Email */}
+                  <span>Cocoonkidssl@gmail.com</span> {/* Updated Email */}
                 </div>
               </div>
             </motion.div>

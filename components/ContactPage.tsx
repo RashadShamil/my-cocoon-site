@@ -20,7 +20,7 @@ export function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const recipient = "Coccoonkids@gmail.com";
+    const recipient = "Cocoonkidssl@gmail.com";
     const subject = `New Inquiry from ${formData.name}`;
     const body = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nMessage:\n${formData.message}`;
     window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -195,7 +195,7 @@ export function ContactPage() {
                   {
                     icon: Mail,
                     title: "Email",
-                    content: "Coccoonkids@gmail.com",
+                    content: "Cocoonkidssl@gmail.com",
                     subtext: "We reply within 24 hours",
                   },
                   {
