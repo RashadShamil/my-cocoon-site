@@ -26,7 +26,6 @@ export default async function Page() {
   return (
   
     <>
-      <WelcomeIntro />
       <HomePage products={products} />
     </>
   );
