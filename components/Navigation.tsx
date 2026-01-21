@@ -25,9 +25,15 @@ export function Navigation() {
   const pathname = usePathname();
   const { isSignedIn, user, isLoaded } = useUser();
   
-  // ✅ FIX: Use 'cartCount' from context
+  // Get animation data and refs
   const { cartCount, flyingItem, onAnimationComplete } = useCart();
   const cartRef = useRef<HTMLButtonElement>(null); 
+
+  // Hydration fix: Ensure component is mounted before checking active paths
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -108,7 +114,7 @@ export function Navigation() {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-1 bg-white/50 p-1 rounded-full border border-white/50">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isMounted && pathname === item.href;
               return (
                 <Link key={item.href} href={item.href} className="relative px-5 py-2 rounded-full text-sm font-medium transition-colors">
                   {isActive && <motion.div layoutId="nav-pill" className="absolute inset-0 bg-primary rounded-full shadow-md shadow-primary/30" transition={{ type: "spring", bounce: 0.2, duration: 0.6 }} />}
@@ -136,14 +142,13 @@ export function Navigation() {
             {isSignedIn && (
               <Link href="/cart">
                 <motion.button
-                  ref={cartRef} // ✅ Attached Ref here
+                  ref={cartRef} // Attached Ref here
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="relative p-2.5 rounded-full bg-pink-50 text-primary border border-pink-100 hover:bg-primary hover:text-white transition-colors group"
                 >
                   <ShoppingBag size={20} />
                   
-                  {/* ✅ FIX: Used cartCount instead of cartItemCount */}
                   <AnimatePresence>
                     {cartCount > 0 && (
                         <motion.span 
