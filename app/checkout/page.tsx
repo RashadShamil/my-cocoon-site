@@ -35,8 +35,11 @@ export default function CheckoutPage() {
   // State
   const [shippingCost, setShippingCost] = useState(0);
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  // ✅ New: Payment Method State
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod");
+
+  // ✅ PayHere Form Data (To submit dynamically)
+  const [payhereData, setPayhereData] = useState<any>(null);
+  const payhereFormRef = useRef<HTMLFormElement>(null);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -67,51 +70,81 @@ export default function CheckoutPage() {
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!selectedDistrict) {
-        alert("Please select a delivery district.");
-        return;
-    }
+    if (!selectedDistrict) { alert("Please select a delivery district."); return; }
 
     setIsProcessing(true);
-
-    // 🕒 Simulate Processing Delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
 
     try {
         const finalTotal = cartTotal + shippingCost;
 
-        // 1. If Online Payment, this is where we will eventually redirect to Gateway
-        if (paymentMethod === 'online') {
-            // For now, we simulate success
-            // alert("Redirecting to Secure Payment Gateway..."); 
-        }
-
-        // 2. Save Order to Sanity
-        const response = await fetch('/api/create-order', {
+        // 1. Create Order in Sanity
+        const createOrderResponse = await fetch('/api/create-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 cart, 
                 formData, 
                 total: finalTotal,
-                paymentMethod // ✅ Send selected method
+                paymentMethod
             }),
         });
 
-        const data = await response.json();
+        const orderData = await createOrderResponse.json();
 
-        if (response.ok) {
+        if (!createOrderResponse.ok) {
+            alert("Failed to create order. Please try again.");
+            setIsProcessing(false);
+            return;
+        }
+
+        // 2. Handle Routing
+        if (paymentMethod === 'cod') {
             clearCart();
-            router.push(`/success?orderId=${data.orderId}`);
+            router.push(`/success?orderId=${orderData.orderId}`);
         } else {
-            alert("Failed to process order. Please try again.");
+            // ✅ ONLINE PAYMENT: Prepare PayHere Data
+            
+            // Get the secure hash from our API
+            const hashResponse = await fetch('/api/payhere-hash', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    order_id: orderData.orderId,
+                    amount: finalTotal,
+                    currency: "LKR"
+                }),
+            });
+            const { hash } = await hashResponse.json();
+
+            // Set data for the hidden form
+            setPayhereData({
+                merchant_id: process.env.NEXT_PUBLIC_PAYHERE_MERCHANT_ID,
+                return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?orderId=${orderData.orderId}`,
+                cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
+                notify_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payhere-notify`, // We will create this later for webhook
+                order_id: orderData.orderId,
+                items: "Cocoon Kids Order",
+                currency: "LKR",
+                amount: finalTotal,
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                address: formData.address,
+                city: formData.district,
+                country: "Sri Lanka",
+                hash: hash,
+            });
+
+            // Wait a tick for state to update, then submit the form automatically
+            setTimeout(() => {
+                payhereFormRef.current?.submit();
+            }, 100);
         }
 
     } catch (error) {
         console.error(error);
         alert("Something went wrong.");
-    } finally {
         setIsProcessing(false);
     }
   };
@@ -120,9 +153,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-        <Link href="/shop">
-          <Button className="bg-primary text-white rounded-full px-8 py-3">Return to Shop</Button>
-        </Link>
+        <Link href="/shop"><Button className="bg-primary text-white rounded-full px-8 py-3">Return to Shop</Button></Link>
       </div>
     );
   }
@@ -135,6 +166,15 @@ export default function CheckoutPage() {
       <motion.div style={{ y, opacity }} className="hidden md:block fixed top-0 left-0 w-full h-[150vh] -z-10">
         <img src="/banner-bg.jpg" alt="Background" className="w-full h-full object-cover object-top" />
       </motion.div>
+
+      {/* ✅ HIDDEN FORM FOR PAYHERE */}
+      {payhereData && (
+        <form ref={payhereFormRef} method="post" action="https://sandbox.payhere.lk/pay/checkout" className="hidden">
+            {Object.keys(payhereData).map((key) => (
+                <input key={key} type="hidden" name={key} value={payhereData[key]} />
+            ))}
+        </form>
+      )}
 
       <div className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-6xl mx-auto">
@@ -161,6 +201,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <form onSubmit={handlePayment} className="space-y-5">
+                  {/* ... FORM FIELDS (Same as before) ... */}
                   <div className="grid grid-cols-2 gap-5">
                     <div className="space-y-2">
                         <label className="text-xs font-bold uppercase text-gray-500 ml-1">First Name</label>
@@ -190,60 +231,34 @@ export default function CheckoutPage() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase text-gray-500 ml-1">District (Delivery Calculation)</label>
                     <div className="relative">
-                        <select 
-                            name="district" 
-                            required 
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:bg-white transition-all appearance-none cursor-pointer"
-                            onChange={handleInputChange}
-                            value={selectedDistrict}
-                        >
+                        <select name="district" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:bg-white transition-all appearance-none cursor-pointer" onChange={handleInputChange} value={selectedDistrict}>
                             <option value="" disabled>Select your district</option>
                             {Object.keys(SHIPPING_RATES).sort().map((district) => (
-                                <option key={district} value={district}>
-                                    {district} - Rs. {SHIPPING_RATES[district]}
-                                </option>
+                                <option key={district} value={district}>{district} - Rs. {SHIPPING_RATES[district]}</option>
                             ))}
                         </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                        </div>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
                     </div>
                   </div>
 
-                  {/* ✅ PAYMENT METHOD SELECTION */}
+                  {/* PAYMENT METHOD */}
                   <div className="pt-4">
                     <label className="text-xs font-bold uppercase text-gray-500 ml-1 mb-3 block">Select Payment Method</label>
                     <div className="grid grid-cols-2 gap-4">
-                        <div 
-                            onClick={() => setPaymentMethod("cod")}
-                            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center justify-center gap-2 text-center ${
-                                paymentMethod === "cod" ? "border-primary bg-pink-50/50" : "border-gray-100 hover:border-gray-200"
-                            }`}
-                        >
+                        <div onClick={() => setPaymentMethod("cod")} className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center justify-center gap-2 text-center ${paymentMethod === "cod" ? "border-primary bg-pink-50/50" : "border-gray-100 hover:border-gray-200"}`}>
                             <CashIcon className={`w-8 h-8 ${paymentMethod === "cod" ? "text-primary" : "text-gray-400"}`} />
                             <span className={`text-sm font-bold ${paymentMethod === "cod" ? "text-primary" : "text-gray-600"}`}>Cash on Delivery</span>
                         </div>
-
-                        <div 
-                            onClick={() => setPaymentMethod("online")}
-                            className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center justify-center gap-2 text-center ${
-                                paymentMethod === "online" ? "border-primary bg-pink-50/50" : "border-gray-100 hover:border-gray-200"
-                            }`}
-                        >
+                        <div onClick={() => setPaymentMethod("online")} className={`cursor-pointer rounded-2xl p-4 border-2 transition-all flex flex-col items-center justify-center gap-2 text-center ${paymentMethod === "online" ? "border-primary bg-pink-50/50" : "border-gray-100 hover:border-gray-200"}`}>
                             <CreditCardIcon className={`w-8 h-8 ${paymentMethod === "online" ? "text-primary" : "text-gray-400"}`} />
                             <span className={`text-sm font-bold ${paymentMethod === "online" ? "text-primary" : "text-gray-600"}`}>Online Payment</span>
                         </div>
                     </div>
                   </div>
 
-                  <Button 
-                    disabled={isProcessing}
-                    className="w-full py-6 text-lg bg-gray-900 hover:bg-black text-white rounded-xl shadow-lg mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    {isProcessing ? "Processing..." : 
-                        paymentMethod === 'cod' ? "Place Order" : "Proceed to Payment"
-                    } 
-                    {paymentMethod === 'online' && <CreditCardIcon className="ml-2 w-5 h-5" />}
+                  <Button disabled={isProcessing} className="w-full py-6 text-lg bg-gray-900 hover:bg-black text-white rounded-xl shadow-lg mt-4 disabled:opacity-70 disabled:cursor-not-allowed">
+                    {isProcessing ? "Processing..." : paymentMethod === 'cod' ? "Place Order" : "Proceed to PayHere"} 
+                    {paymentMethod === 'online' && !isProcessing && <CreditCardIcon className="ml-2 w-5 h-5" />}
                   </Button>
 
                   <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-1 mt-4">
@@ -257,7 +272,6 @@ export default function CheckoutPage() {
             <div className="lg:col-span-5">
               <div className="bg-white/90 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-xl border border-white sticky top-32">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h3>
-                
                 <div className="max-h-[300px] overflow-y-auto pr-2 space-y-4 mb-6 custom-scrollbar">
                   {cart.map((item) => (
                     <div key={item._id} className="flex gap-4 items-center border-b border-dashed border-gray-200 pb-4">
@@ -272,17 +286,11 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-
                 <div className="space-y-3 pt-2">
-                    <div className="flex justify-between text-gray-600">
-                        <span>Subtotal</span>
-                        <span>Rs. {cartTotal.toLocaleString()}</span>
-                    </div>
+                    <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>Rs. {cartTotal.toLocaleString()}</span></div>
                     <div className="flex justify-between text-gray-600">
                         <span>Shipping ({selectedDistrict || "Select District"})</span>
-                        <span className="text-green-600 font-medium">
-                            {shippingCost > 0 ? `Rs. ${shippingCost}` : "--"}
-                        </span>
+                        <span className="text-green-600 font-medium">{shippingCost > 0 ? `Rs. ${shippingCost}` : "--"}</span>
                     </div>
                     <div className="flex justify-between items-center pt-4 border-t border-gray-200">
                         <span className="text-lg font-bold text-gray-900">Total</span>

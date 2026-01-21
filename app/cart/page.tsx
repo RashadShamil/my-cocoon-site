@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-// ✅ REMOVED: import { ShoppingBag, Trash2, ArrowRight, CheckCircle, Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/button";
@@ -13,21 +12,15 @@ import { useCart } from "@/context/CartContext";
 const ShoppingBagIcon = (props: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
 );
-
 const Trash2Icon = (props: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
 );
-
 const ArrowRightIcon = (props: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 );
-
-// ✅ REQUESTED: CheckCircle
 const CheckCircleIcon = (props: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
 );
-
-// ✅ REQUESTED: Plus
 const PlusIcon = (props: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
 );
@@ -35,8 +28,6 @@ const PlusIcon = (props: any) => (
 
 export default function CartPage() {
   const containerRef = useRef(null);
-  
-  // Get Cart Data
   const { cart, removeFromCart, cartTotal, addToCart } = useCart();
 
   // --- PARALLAX SETUP ---
@@ -102,39 +93,45 @@ export default function CartPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      className="bg-white/80 backdrop-blur-xl p-4 rounded-3xl shadow-sm border border-white flex gap-4 items-center group"
+                      className="bg-white/80 backdrop-blur-xl p-4 rounded-3xl shadow-sm border border-white flex flex-col sm:flex-row gap-4 items-center group relative overflow-hidden"
                     >
                       {/* Product Image */}
-                      <div className="relative w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
+                      <div className="relative w-full h-48 sm:w-24 sm:h-24 flex-shrink-0 rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
                         <Image src={urlFor(item.imageUrl).url()} alt={item.name} fill className="object-cover" />
                       </div>
 
                       {/* Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h3 className="font-bold text-gray-900 truncate pr-4">{item.name}</h3>
-                                <p className="text-sm text-gray-500">Size: {item.size || "Standard"}</p>
+                      <div className="flex-1 w-full min-w-0 flex flex-col justify-between">
+                        
+                        {/* Title & Price Row */}
+                        <div className="flex justify-between items-start mb-2">
+                            <div className="pr-4">
+                                <h3 className="font-bold text-gray-900 text-lg sm:text-base leading-tight">{item.name}</h3>
+                                <p className="text-sm text-gray-500 mt-1">Size: {item.size || "Standard"}</p>
                             </div>
-                            <p className="font-bold text-primary text-lg">Rs. {(item.price * item.quantity).toLocaleString()}</p>
+                            <p className="font-bold text-primary text-lg whitespace-nowrap">Rs. {(item.price * item.quantity).toLocaleString()}</p>
                         </div>
 
-                        <div className="flex items-center justify-between mt-4">
-                            <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1 border border-gray-200">
-                                <span className="text-xs font-bold px-3">Qty: {item.quantity}</span>
+                        {/* Actions Row */}
+                        <div className="flex items-center justify-between mt-2 sm:mt-0">
+                            {/* Quantity Controls */}
+                            <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-1 border border-gray-200">
+                                <span className="text-xs font-bold px-3 text-gray-600 uppercase tracking-wider">Qty: {item.quantity}</span>
                                 <button 
                                     onClick={() => addToCart(item, item.size)}
-                                    className="w-6 h-6 bg-white rounded flex items-center justify-center shadow-sm hover:text-primary"
+                                    className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm hover:text-primary transition-colors active:scale-95"
+                                    suppressHydrationWarning={true}
                                 >
-                                    {/* ✅ Using Brute Force PlusIcon */}
-                                    <PlusIcon className="w-3 h-3" />
+                                    <PlusIcon className="w-4 h-4" />
                                 </button>
                             </div>
 
+                            {/* Remove Button */}
                             <button 
                                 onClick={() => removeFromCart(item._id)}
-                                className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"
+                                className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-full transition-colors"
                                 title="Remove Item"
+                                suppressHydrationWarning={true}
                             >
                                 <Trash2Icon className="w-5 h-5" />
                             </button>
@@ -177,7 +174,6 @@ export default function CartPage() {
                         </Link>
 
                         <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400">
-                            {/* ✅ Using Brute Force CheckCircleIcon */}
                             <CheckCircleIcon className="w-4 h-4" /> Secure Checkout
                         </div>
                     </div>

@@ -1,6 +1,5 @@
 import product from './product'
-// ✅ Import the review schema
 import review from './review'
+import order from './order'
 
-// ✅ Add 'review' to the array
-export const schemaTypes = [product, review]
+export const schemaTypes = [product, review, order]
