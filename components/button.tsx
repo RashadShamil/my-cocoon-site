@@ -50,6 +50,7 @@ function Button({
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      suppressHydrationWarning={true} // ✅ FIX: Ignores browser extension attributes
       {...props}
     />
   );

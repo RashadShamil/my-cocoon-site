@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react"; // ✅ Added for state management
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Mail, Phone, ArrowRight, Sparkles, Facebook, Instagram, Twitter } from "lucide-react";
 import Link from "next/link";
@@ -8,9 +8,9 @@ import { Button } from "@/components/button";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState(""); // ✅ Track email input
+  const [email, setEmail] = useState("");
 
-  // ✅ Handle Subscription
+  // Handle Subscription
   const handleSubscribe = () => {
     if (!email) {
       alert("Please enter your email address.");
@@ -23,7 +23,6 @@ export function Footer() {
 
     window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Optional: Clear input
     setEmail("");
   };
 
@@ -35,7 +34,7 @@ export function Footer() {
       transition: {
         staggerChildren: 0.1,
         delayChildren: 0.2,
-      },                                              
+      },                                      
     },
   };
 
@@ -154,36 +153,42 @@ export function Footer() {
               <h4 className="text-lg font-bold text-foreground mb-6">Stay in the Magic</h4>
               <div className="bg-white/60 backdrop-blur-sm p-6 rounded-3xl shadow-xl shadow-pink-100/50 border border-white">
                 <p className="text-sm text-muted-foreground mb-4">Subscribe for exclusive offers and new arrivals!</p>
+                
+                {/* ✅ HYDRATION FIX: 
+                   The <input> and <Button> are wrapped in a clean <div>. 
+                   suppressHydrationWarning is added to ignore browser extensions (like LastPass) injecting attributes.
+                */}
                 <div className="space-y-3">
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    {/* ✅ FIX: Added value and onChange for controlled input */}
                     <input 
                       type="email" 
                       placeholder="mommy@email.com" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      suppressHydrationWarning
                       className="w-full pl-10 pr-4 py-2 rounded-xl border border-pink-100 bg-pink-50/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
                     />
                   </div>
-                  {/* ✅ FIX: Added onClick handler */}
                   <Button 
                     onClick={handleSubscribe}
+                    suppressHydrationWarning
                     className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
                   >
                     Subscribe
                   </Button>
                 </div>
+
               </div>
               
               <div className="mt-6 flex flex-col gap-2 text-sm text-muted-foreground pl-2">
                 <div className="flex items-center gap-2">
                   <Phone size={16} className="text-primary" />
-                  <span>+94 77 383 4674</span> {/* Updated Number */}
+                  <span>+94 77 383 4674</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={16} className="text-primary" />
-                  <span>Cocoonkidssl@gmail.com</span> {/* Updated Email */}
+                  <span>Cocoonkidssl@gmail.com</span>
                 </div>
               </div>
             </motion.div>

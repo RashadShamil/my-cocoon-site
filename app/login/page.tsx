@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-// ✅ KEEPING WORKING ICONS: These stay imported from the library
 import { Sparkles, Mail, ArrowRight } from "lucide-react"; 
 import Link from "next/link";
 import { Button } from "@/components/button";
@@ -10,7 +9,7 @@ import { Input } from "@/components/input";
 import { useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-// --- BRUTE FORCE ICONS (Inline replacements for the ones causing errors) ---
+// --- INLINE ICONS ---
 const Lock = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +47,6 @@ const AlertCircle = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-// Simple Google Icon Component
 const GoogleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -142,7 +140,6 @@ export default function LoginPage() {
 
           {error && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 relative z-10">
-              {/* Using Brute Forced Icon */}
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <p className="text-sm font-medium">{error}</p>
             </motion.div>
@@ -157,7 +154,6 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
                <div className="relative">
-                {/* Using Brute Forced Icon */}
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input id="password" placeholder="Password" type="password" autoComplete="current-password" disabled={isLoading} value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 bg-white/80 border-gray-200 focus:border-primary focus:ring-primary rounded-xl py-6" />
               </div>
@@ -167,13 +163,13 @@ export default function LoginPage() {
                   </Link>
               </div>
             </div>
-            
+             
             <Button disabled={isLoading || !isLoaded} className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl text-lg shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
               {isLoading && ( <Sparkles className="mr-2 h-4 w-4 animate-spin" /> )}
               Sign In <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </form>
-            
+             
            {/* Divider */}
            <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
