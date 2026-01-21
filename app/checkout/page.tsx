@@ -76,6 +76,10 @@ export default function CheckoutPage() {
 
     try {
         const finalTotal = cartTotal + shippingCost;
+        
+        // ✅ FIX: Force exactly 2 decimal places (e.g., "4100.00")
+        // This MUST match exactly what we do in the API route hash generation
+        const amountString = finalTotal.toFixed(2); 
 
         // 1. Create Order in Sanity
         const createOrderResponse = await fetch('/api/create-order', {
@@ -84,7 +88,7 @@ export default function CheckoutPage() {
             body: JSON.stringify({ 
                 cart, 
                 formData, 
-                total: finalTotal,
+                total: finalTotal, // Save number to DB
                 paymentMethod
             }),
         });
@@ -110,7 +114,7 @@ export default function CheckoutPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     order_id: orderData.orderId,
-                    amount: finalTotal,
+                    amount: amountString, // Send "4100.00" to hash generator
                     currency: "LKR"
                 }),
             });
@@ -121,11 +125,11 @@ export default function CheckoutPage() {
                 merchant_id: process.env.NEXT_PUBLIC_PAYHERE_MERCHANT_ID,
                 return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?orderId=${orderData.orderId}`,
                 cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
-                notify_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payhere-notify`, // We will create this later for webhook
+                notify_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payhere-notify`, 
                 order_id: orderData.orderId,
                 items: "Cocoon Kids Order",
                 currency: "LKR",
-                amount: finalTotal,
+                amount: amountString, // ✅ Send "4100.00" to PayHere form (MUST MATCH HASH)
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 email: formData.email,
@@ -201,7 +205,6 @@ export default function CheckoutPage() {
                 </div>
 
                 <form onSubmit={handlePayment} className="space-y-5">
-                  {/* ... FORM FIELDS (Same as before) ... */}
                   <div className="grid grid-cols-2 gap-5">
                     <div className="space-y-2">
                         <label className="text-xs font-bold uppercase text-gray-500 ml-1">First Name</label>
