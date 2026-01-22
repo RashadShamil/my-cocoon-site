@@ -96,7 +96,7 @@ export default async function OrdersPage() {
               <section className="animate-in slide-in-from-bottom-4 duration-700">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="p-2 bg-blue-50 rounded-full"><Icons.Truck className="w-6 h-6 text-blue-600" /></div>
-                    <h2 className="text-2xl font-bold text-gray-900">On the Way</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">You Orders</h2>
                 </div>
                 <div className="grid gap-6">
                   {activeOrders.map((order: any) => (

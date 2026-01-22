@@ -42,6 +42,7 @@ export default {
           { title: 'Pending', value: 'pending' },
           { title: 'Paid', value: 'paid' },
           { title: 'Shipped', value: 'shipped' },
+          { title: 'Delivered', value: 'delivered' },
         ],
         layout: 'radio'
       },

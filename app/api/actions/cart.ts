@@ -9,9 +9,9 @@ const writeClient = client.withConfig({
 
 export async function syncCartToSanity(email: string, cartItems: any[]) {
   try {
-    // ✅ TRANSFORM 1: Frontend (_id) -> Sanity (productId)
+    // ✅ TRANSLATION LAYER: Frontend (_id) -> Database (productId)
     const sanityFriendlyItems = cartItems.map((item) => ({
-      productId: item._id, // Map _id to productId
+      productId: item._id, // Map the ID here
       name: item.name,
       price: item.price,
       quantity: item.quantity,
@@ -50,10 +50,9 @@ export async function fetchCartFromSanity(email: string) {
 
     if (!cartData) return [];
 
-    // ✅ TRANSFORM 2: Sanity (productId) -> Frontend (_id)
-    // We map it back so your CartContext doesn't break
+    // ✅ TRANSLATION LAYER: Database (productId) -> Frontend (_id)
     return cartData.map((item: any) => ({
-      _id: item.productId,
+      _id: item.productId, // Map it back so the UI doesn't break
       name: item.name,
       price: item.price,
       quantity: item.quantity,
