@@ -2,32 +2,38 @@
 
 import { client } from "@/sanity/lib/client";
 
-// Create a write client using the token
 const writeClient = client.withConfig({
-  token: process.env.SANITY_API_TOKEN, // Make sure this is in your .env.local
-  useCdn: false, // We need fresh data for carts
+  token: process.env.SANITY_API_TOKEN,
+  useCdn: false,
 });
 
 export async function syncCartToSanity(email: string, cartItems: any[]) {
   try {
-    // 1. Check if a cart already exists for this user
+    // ✅ TRANSFORM 1: Frontend (_id) -> Sanity (productId)
+    const sanityFriendlyItems = cartItems.map((item) => ({
+      productId: item._id, // Map _id to productId
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      size: item.size,
+      imageUrl: item.imageUrl,
+    }));
+
     const existingCart = await client.fetch(
       `*[_type == "cart" && userEmail == $email][0]._id`,
       { email }
     );
 
     if (existingCart) {
-      // 2. Update existing cart
       await writeClient
         .patch(existingCart)
-        .set({ items: cartItems })
+        .set({ items: sanityFriendlyItems })
         .commit();
     } else {
-      // 3. Create new cart
       await writeClient.create({
         _type: "cart",
         userEmail: email,
-        items: cartItems,
+        items: sanityFriendlyItems,
       });
     }
   } catch (error) {
@@ -41,7 +47,20 @@ export async function fetchCartFromSanity(email: string) {
       `*[_type == "cart" && userEmail == $email][0].items`,
       { email }
     );
-    return cartData || [];
+
+    if (!cartData) return [];
+
+    // ✅ TRANSFORM 2: Sanity (productId) -> Frontend (_id)
+    // We map it back so your CartContext doesn't break
+    return cartData.map((item: any) => ({
+      _id: item.productId,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      size: item.size,
+      imageUrl: item.imageUrl,
+    }));
+
   } catch (error) {
     console.error("Error fetching cart:", error);
     return [];
