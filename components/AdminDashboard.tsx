@@ -36,6 +36,10 @@ import {
 } from "recharts";
 import { AddProductForm } from "./AddProductForm";
 import { TestEmailButton } from "./TestEmailButton";
+import { deleteProductAction } from "@/app/admin/actions";
+
+const Edit2 = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>);
+const Trash2 = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
 
 interface AdminDashboardProps {
   orders: any[];
@@ -79,7 +83,16 @@ const OrderCard = ({ order }: { order: any }) => (
 
 export function AdminDashboard({ orders, products, reviews }: AdminDashboardProps) {
   const [sparkles, setSparkles] = useState<any[]>([]);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [showProductModal, setShowProductModal] = useState(false);
+
+  async function handleDeleteProduct(id: string) {
+    if (confirm("Are you sure you want to permanently delete this dress?")) {
+      await deleteProductAction(id);
+    }
+  }
 
   // Parallax Setup
   const { scrollYProgress } = useScroll({
@@ -195,7 +208,41 @@ export function AdminDashboard({ orders, products, reviews }: AdminDashboardProp
                   </motion.div>
                 ))}
               </div>
-              <AddProductForm />
+              <div className="bg-white/60 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl border border-white/40">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <Sparkles className="text-primary" /> Live Inventory
+                  </h2>
+                  <button 
+                    onClick={() => { setEditingProduct(null); setShowProductModal(true); }}
+                    className="bg-primary hover:bg-accent text-white px-4 py-2 rounded-full font-bold shadow-md transition"
+                  >
+                    + Add New Dress
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {products.map((p) => (
+                    <div key={p._id} className="bg-white/80 rounded-2xl p-4 shadow border border-pink-100 flex flex-col items-center text-center relative group">
+                      <div className="w-full h-32 rounded-xl mb-3 overflow-hidden bg-pink-50 relative">
+                        {p.imageUrl ? (
+                          <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition transform group-hover:scale-105" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-pink-300 font-bold">No Image</div>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-gray-800 text-sm leading-tight mb-1">{p.name}</h3>
+                      <p className="text-primary font-extrabold text-sm border-t border-pink-100 pt-2 w-full">LKR {p.price}</p>
+                      <p className="text-xs text-gray-500 mt-1">{p.sizeOptions?.length || 0} Variants</p>
+                      
+                      <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
+                        <button onClick={() => { setEditingProduct(p); setShowProductModal(true); }} className="p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow"><Edit2/></button>
+                        <button onClick={() => handleDeleteProduct(p._id)} className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow"><Trash2/></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                 className="bg-white/60 backdrop-blur-md p-6 rounded-[2.5rem] shadow-xl border border-white/40"
@@ -274,9 +321,20 @@ export function AdminDashboard({ orders, products, reviews }: AdminDashboardProp
       {/* Scrollbar styling specifically for these modules */}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.3); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
       `}</style>
+      
+      {showProductModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar relative border border-pink-200">
+             <AddProductForm 
+                initialData={editingProduct} 
+                onClose={() => setShowProductModal(false)}
+             />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
