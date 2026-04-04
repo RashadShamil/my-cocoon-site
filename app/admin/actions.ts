@@ -55,3 +55,18 @@ export async function createProductAction(formData: FormData) {
     return { success: false, error: error.message };
   }
 }
+
+import { sendCuteOrderEmail } from "@/lib/sendOrderEmail";
+
+export async function sendTestEmailAction(toEmail: string) {
+  // Pass dummy data simulating an order transaction
+  return await sendCuteOrderEmail({
+    customerName: "Magic Customer",
+    orderNumber: "PINK-1234",
+    totalAmount: 6500,
+    items: [
+      { productName: "Enchanted Bloom Frock", quantity: 1, price: 4500 },
+      { productName: "Sparkle Tiara", quantity: 1, price: 2000 }
+    ]
+  }, toEmail);
+}

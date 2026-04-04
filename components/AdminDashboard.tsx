@@ -34,7 +34,8 @@ import { useEffect, useState, useRef } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area
 } from "recharts";
-import { AddProductForm } from "./AddProductForm"; // ✅ Import new native form
+import { AddProductForm } from "./AddProductForm";
+import { TestEmailButton } from "./TestEmailButton";
 
 interface AdminDashboardProps {
   orders: any[];
@@ -162,6 +163,9 @@ export function AdminDashboard({ orders, products, reviews }: AdminDashboardProp
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
               Cocoon Kids Admin
             </h1>
+            <div className="flex gap-4">
+               <TestEmailButton />
+            </div>
           </div>
 
           {/* Main Layout Grid */}
