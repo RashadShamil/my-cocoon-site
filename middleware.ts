@@ -9,10 +9,10 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 // ✅ FIX: Remove the parentheses () after auth
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    // It should be auth.protect(), not auth().protect()
-    auth.protect();
+    // It should be await auth.protect() in Clerk v6
+    await auth.protect();
   }
 });
 
