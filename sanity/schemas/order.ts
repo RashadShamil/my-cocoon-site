@@ -7,6 +7,7 @@ export default {
   icon: ShoppingBag,
   fields: [
     { name: 'orderNumber', title: 'Order Number', type: 'string' },
+    { name: 'orderDate', title: 'Order Date', type: 'date' },
     { name: 'customerName', title: 'Customer Name', type: 'string' },
     { name: 'email', title: 'Email', type: 'string' },
     { name: 'phone', title: 'Phone', type: 'string' },

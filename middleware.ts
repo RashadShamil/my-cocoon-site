@@ -5,7 +5,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 const isProtectedRoute = createRouteMatcher([
   '/checkout(.*)',
   '/api(.*)',
-  // Add other private routes here
+  '/admin(.*)',
 ]);
 
 // ✅ FIX: Remove the parentheses () after auth
