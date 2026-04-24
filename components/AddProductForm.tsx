@@ -9,6 +9,7 @@ const Check = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg
 const UploadCloud = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>);
 const PlusCircle = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>);
 const Trash2 = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
+const XIcon = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
 
 export function AddProductForm({ initialData = null, onClose = () => {} }: { initialData?: any, onClose?: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -59,12 +60,15 @@ export function AddProductForm({ initialData = null, onClose = () => {} }: { ini
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-2 space-y-5 relative">
-      {initialData && (
-        <button type="button" onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-red-500">
-           <Trash2 className="w-5 h-5"/> Close
-        </button>
-      )}
+    <form onSubmit={handleSubmit} className="p-6 pt-12 space-y-5 relative">
+      <button 
+        type="button" 
+        onClick={onClose} 
+        className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-red-100 rounded-full text-gray-500 hover:text-red-600 transition-colors z-10"
+        title="Close"
+      >
+         <XIcon className="w-5 h-5"/>
+      </button>
       
       {success && (
         <div className="bg-green-100 text-green-700 p-4 rounded-xl mb-4 flex items-center gap-2">

@@ -2,6 +2,7 @@
 
 import { createClient } from "next-sanity";
 import { revalidatePath } from "next/cache";
+import { sendCuteOrderEmail } from "@/lib/sendOrderEmail";
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -14,7 +15,7 @@ const client = createClient({
 export async function deleteProductAction(id: string) {
   try {
     await client.delete(id);
-    revalidatePath("/admin");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -70,7 +71,7 @@ export async function createProductAction(formData: FormData) {
     };
 
     await client.create(newProduct);
-    revalidatePath("/admin");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -117,14 +118,12 @@ export async function updateProductAction(id: string, formData: FormData) {
     }
 
     await client.patch(id).set(updates).commit();
-    revalidatePath("/admin");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
 }
-
-import { sendCuteOrderEmail } from "@/lib/sendOrderEmail";
 
 export async function sendTestEmailAction(toEmail: string) {
   // Pass dummy data simulating an order transaction
