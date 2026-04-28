@@ -18,9 +18,11 @@ export function AddProductForm({ initialData = null, onClose = () => {} }: { ini
   // States prepopulated 
   const [name, setName] = useState(initialData?.name || "");
   const [price, setPrice] = useState(initialData?.price || "");
-  const [category, setCategory] = useState(initialData?.category || "party");
+  const [category, setCategory] = useState(initialData?.category || "Casual Dresses");
   const [description, setDescription] = useState(initialData?.description || "");
   const [sizeOptions, setSizeOptions] = useState<{size: string, price: number}[]>(initialData?.sizeOptions || []);
+  const [isSale, setIsSale] = useState(initialData?.isSale || false);
+  const [originalPrice, setOriginalPrice] = useState(initialData?.originalPrice || "");
 
   const addSize = () => setSizeOptions([...sizeOptions, { size: "", price: 0 }]);
   const removeSize = (i: number) => setSizeOptions(sizeOptions.filter((_, idx) => idx !== i));
@@ -47,7 +49,7 @@ export function AddProductForm({ initialData = null, onClose = () => {} }: { ini
     if (res?.success) {
       setSuccess(true);
       if (!initialData) {
-        setName(""); setPrice(""); setDescription(""); setSizeOptions([]);
+        setName(""); setPrice(""); setDescription(""); setSizeOptions([]); setIsSale(false); setOriginalPrice("");
       }
       setTimeout(() => {
         setSuccess(false);
@@ -82,10 +84,35 @@ export function AddProductForm({ initialData = null, onClose = () => {} }: { ini
           <input name="name" required value={name} onChange={e=>setName(e.target.value)} className="w-full px-4 py-2 border-2 border-pink-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Enchanted Bloom..." />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Base Price (LKR)</label>
-          <input name="price" type="number" required value={price} onChange={e=>setPrice(e.target.value)} className="w-full px-4 py-2 border-2 border-pink-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="3500" />
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+          <select name="category" value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-4 py-2 border-2 border-pink-200 rounded-xl focus:ring-2 focus:ring-primary outline-none bg-white">
+            <option value="Casual Dresses">Casual Dresses</option>
+            <option value="Infant Wear">Infant Wear</option>
+            <option value="Party Wear">Party Wear</option>
+            <option value="Girls' Tops">Girls' Tops</option>
+          </select>
         </div>
       </div>
+
+      <div className="grid grid-cols-2 gap-4 mt-4">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Selling Price (LKR)</label>
+          <input name="price" type="number" required value={price} onChange={e=>setPrice(e.target.value)} className="w-full px-4 py-2 border-2 border-pink-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="3500" />
+        </div>
+        <div className="flex flex-col justify-end">
+          <label className="flex items-center gap-2 cursor-pointer p-2 border-2 border-pink-200 rounded-xl bg-pink-50 w-full mb-[2px]">
+            <input type="checkbox" name="isSale" checked={isSale} onChange={e=>setIsSale(e.target.checked)} value="true" className="w-5 h-5 accent-primary" />
+            <span className="text-sm font-semibold text-gray-700">Mark as Sale Item</span>
+          </label>
+        </div>
+      </div>
+
+      {isSale && (
+        <div className="mt-4">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Original Price (Before Sale, LKR)</label>
+          <input name="originalPrice" type="number" required value={originalPrice} onChange={e=>setOriginalPrice(e.target.value)} className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary outline-none bg-gray-50 text-gray-500" placeholder="5000" />
+        </div>
+      )}
 
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>

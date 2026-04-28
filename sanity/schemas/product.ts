@@ -17,13 +17,23 @@ export default {
         maxLength: 96,
       },
     },
-    // ✅ KEEP THIS: It will act as the "Display Price" or "Starting At" price
     {
       name: 'price',
       title: 'Display Price (Starting From)',
       type: 'number',
     },
-    // ✅ NEW FIELD: A list where you can add specific sizes and their prices
+    {
+      name: 'isSale',
+      title: 'Is this item on sale?',
+      type: 'boolean',
+      initialValue: false,
+    },
+    {
+      name: 'originalPrice',
+      title: 'Original Price (Before Sale)',
+      type: 'number',
+      hidden: ({ document }: any) => !document?.isSale,
+    },
     {
       name: 'sizeOptions',
       title: 'Sizes & Variants',
@@ -32,8 +42,8 @@ export default {
         {
           type: 'object',
           fields: [
-            { name: 'size', title: 'Size Label', type: 'string' }, // e.g., "3-4 Years"
-            { name: 'price', title: 'Price for this Size', type: 'number' } // e.g., 1600
+            { name: 'size', title: 'Size Label', type: 'string' },
+            { name: 'price', title: 'Price for this Size', type: 'number' }
           ]
         }
       ]
@@ -46,12 +56,11 @@ export default {
         hotspot: true,
       },
     },
-    // Add this INSIDE the fields array, maybe after the main 'image' field
     {
       name: 'gallery',
       title: 'Extra Images (Gallery)',
       type: 'array',
-      of: [{ type: 'image' }], // This allows you to add a list of images
+      of: [{ type: 'image' }],
     },
     {
       name: 'description',
@@ -64,9 +73,10 @@ export default {
       type: 'string',
       options: {
         list: [
-          { title: 'Party Wear', value: 'party' },
-          { title: 'Casual', value: 'casual' },
-          { title: 'Accessories', value: 'accessories' },
+          { title: 'Casual Dresses', value: 'Casual Dresses' },
+          { title: 'Infant Wear', value: 'Infant Wear' },
+          { title: 'Party Wear', value: 'Party Wear' },
+          { title: 'Girls\' Tops', value: 'Girls\' Tops' },
         ],
       },
     },

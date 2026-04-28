@@ -36,6 +36,9 @@ export async function createProductAction(formData: FormData) {
     const category = formData.get("category") as string;
     const description = formData.get("description") as string || "";
     const sizeOptionsStr = formData.get("sizeOptions") as string;
+    const isSale = formData.get("isSale") === "true";
+    const originalPriceStr = formData.get("originalPrice");
+    const originalPrice = originalPriceStr ? Number(originalPriceStr) : undefined;
     
     let sizeOptions = [];
     if (sizeOptionsStr) {
@@ -65,7 +68,9 @@ export async function createProductAction(formData: FormData) {
       price,
       description,
       sizeOptions,
-      category: category || "dress",
+      category: category || "Casual Dresses",
+      isSale,
+      ...(originalPrice && { originalPrice }),
       ...(mainAssetId && { image: { _type: "image", asset: { _type: "reference", _ref: mainAssetId } } }),
       ...(galleryAssets.length > 0 && { gallery: galleryAssets })
     };
@@ -85,6 +90,9 @@ export async function updateProductAction(id: string, formData: FormData) {
     const category = formData.get("category") as string;
     const description = formData.get("description") as string || "";
     const sizeOptionsStr = formData.get("sizeOptions") as string;
+    const isSale = formData.get("isSale") === "true";
+    const originalPriceStr = formData.get("originalPrice");
+    const originalPrice = originalPriceStr ? Number(originalPriceStr) : null; // Use null to clear it if it was removed
     
     let sizeOptions = [];
     if (sizeOptionsStr) {
@@ -94,10 +102,14 @@ export async function updateProductAction(id: string, formData: FormData) {
     const updates: any = {
       name,
       price,
-      category: category || "dress",
+      category: category || "Casual Dresses",
       description,
-      sizeOptions
+      sizeOptions,
+      isSale,
+      ...(originalPrice !== null ? { originalPrice } : {}) // we'll just not send it if null, or maybe we want to unset it. Let's send it if not null. Wait, setting to null in Sanity unsets it. So we can just set originalPrice: originalPrice
     };
+    // actually, let's just assign originalPrice directly
+    updates.originalPrice = originalPrice;
 
     // Replace Image if explicitly provided
     const mainImageFile = formData.get("image") as File;

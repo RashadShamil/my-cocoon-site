@@ -25,6 +25,8 @@ interface Product {
   slug: string;
   imageUrl: string;
   category: string;
+  isSale?: boolean;
+  originalPrice?: number;
 }
 
 interface ShopPageProps {
@@ -48,10 +50,19 @@ export function ShopPage({ products }: ShopPageProps) {
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.7]);
 
   // Filter logic
-  const uniqueCategories = ["All", ...Array.from(new Set(products.map((p) => p.category).filter(Boolean)))];
+  const staticCategories = ["Casual Dresses", "Infant Wear", "Party Wear", "Girls' Tops"];
+  const existingCategories = products.map((p) => p.category).filter(Boolean);
+  const uniqueCategories = ["All", ...Array.from(new Set([...staticCategories, ...existingCategories])), "Sale"];
 
   const filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+    let matchesCategory = false;
+    if (selectedCategory === "All") {
+      matchesCategory = true;
+    } else if (selectedCategory === "Sale") {
+      matchesCategory = !!product.isSale;
+    } else {
+      matchesCategory = product.category === selectedCategory;
+    }
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -208,9 +219,16 @@ export function ShopPage({ products }: ShopPageProps) {
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         
-                        {/* Category Badge */}
-                        <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 text-primary font-bold rounded-full text-[10px] uppercase tracking-wider">
-                          {product.category}
+                        {/* Category & Sale Badge */}
+                        <div className="absolute top-3 left-3 flex gap-2">
+                          <div className="px-2 py-1 bg-white/90 text-primary font-bold rounded-full text-[10px] uppercase tracking-wider shadow-sm">
+                            {product.category}
+                          </div>
+                          {product.isSale && (
+                            <div className="px-2 py-1 bg-red-500 text-white font-bold rounded-full text-[10px] uppercase tracking-wider shadow-sm animate-pulse">
+                              Sale
+                            </div>
+                          )}
                         </div>
                       </div>
                     </Link>
@@ -247,7 +265,16 @@ export function ShopPage({ products }: ShopPageProps) {
                         </div>
 
                         <div className="flex items-center justify-between mt-2">
-                          <p className="text-primary font-bold text-lg">Rs. {product.price}</p>
+                          <div className="flex flex-col">
+                            {product.isSale && product.originalPrice ? (
+                              <>
+                                <p className="text-gray-400 font-semibold text-xs line-through">Rs. {product.originalPrice}</p>
+                                <p className="text-red-500 font-bold text-lg">Rs. {product.price}</p>
+                              </>
+                            ) : (
+                              <p className="text-primary font-bold text-lg">Rs. {product.price}</p>
+                            )}
+                          </div>
                           
                           {/* ✅ REPLACED "Add +" BUTTON WITH "View" LINK */}
                           <Link href={`/product/${product.slug}`}>

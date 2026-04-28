@@ -40,6 +40,8 @@ interface ProductProps {
     category: string;
     sizeOptions?: { size: string; price: number }[];
     reviews?: Review[];
+    isSale?: boolean;
+    originalPrice?: number;
   };
 }
 
@@ -216,13 +218,23 @@ export default function ProductDetails({ product }: ProductProps) {
             <div className="flex flex-col">
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                    <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">{product.category}</span>
+                    <div className="flex gap-2">
+                      <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">{product.category}</span>
+                      {product.isSale && (
+                        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide animate-pulse">Sale</span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1 text-yellow-500 text-sm font-bold bg-yellow-50 px-2 py-1 rounded-lg">
                         <StarIcon className="w-4 h-4 fill-current" /> {averageRating}
                     </div>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 mb-2">{product.name}</h1>
-                <p className="text-3xl font-bold text-primary">Rs. {currentPrice.toLocaleString()}</p>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-3xl font-bold text-primary">Rs. {currentPrice.toLocaleString()}</p>
+                  {product.isSale && product.originalPrice && (
+                    <p className="text-xl font-semibold text-gray-400 line-through">Rs. {product.originalPrice.toLocaleString()}</p>
+                  )}
+                </div>
               </div>
 
               <p className="text-gray-600 leading-relaxed mb-8 text-lg">{product.description}</p>
