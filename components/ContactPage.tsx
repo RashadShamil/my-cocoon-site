@@ -139,7 +139,7 @@ export function ContactPage() {
                     <label className="block mb-2 font-medium text-gray-700">Phone Number</label>
                     <Input
                       type="tel"
-                      placeholder="+94771234567"
+                      placeholder="070 132 7373"
                       value={formData.phone}
                       onChange={(e) =>
                         setFormData({ ...formData, phone: e.target.value })
@@ -189,7 +189,7 @@ export function ContactPage() {
                   {
                     icon: Phone,
                     title: "Phone",
-                    content: "+94 77 383 4674",
+                    content: "070 132 7373",
                     subtext: "Mon-Sun 9am-6pm",
                   },
                   {

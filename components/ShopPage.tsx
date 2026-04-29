@@ -70,7 +70,7 @@ export function ShopPage({ products }: ShopPageProps) {
   // WhatsApp Helper
   const handleWhatsApp = (productName: string) => {
     const message = `Hi! I'm interested in buying the ${productName}. Is it available?`;
-    window.open(`https://wa.me/94771234567?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/94701327373?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
@@ -150,7 +150,7 @@ export function ShopPage({ products }: ShopPageProps) {
                   Checkout Now
                 </Button>
                 <button 
-                   onClick={() => window.open(`https://wa.me/94771234567?text=I want to order items worth Rs. ${cartTotal}`, '_blank')}
+                   onClick={() => window.open(`https://wa.me/94701327373?text=I want to order items worth Rs. ${cartTotal}`, '_blank')}
                    className="w-full text-green-600 font-semibold text-sm hover:underline text-center"
                 >
                   Or Order via WhatsApp

@@ -117,7 +117,7 @@ export default function ProductDetails({ product }: ProductProps) {
       alert("Please select a size first!");
       return;
     }
-    const phoneNumber = "94773834674"; 
+    const phoneNumber = "94701327373"; 
     const message = `Hi! I would like to order: ${product.name} (Size: ${selectedSize || "Standard"})`;
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
