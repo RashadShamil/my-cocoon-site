@@ -26,7 +26,7 @@ export default async function AdminPage() {
   const userEmail = user.emailAddresses[0]?.emailAddress;
   
   // Read allowed admin emails from environment variables (comma-separated if multiple)
-  const adminEmails = process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(",") : [];
+  const adminEmails = process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(",").map(email => email.trim()) : [];
 
   // If the user's email isn't in the list, redirect them to the homepage
   if (!adminEmails.includes(userEmail)) {
