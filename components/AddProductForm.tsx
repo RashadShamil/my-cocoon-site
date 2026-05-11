@@ -251,7 +251,7 @@ export function AddProductForm({ initialData = null, onClose = () => {} }: { ini
             
             <div className="pl-4 border-l-2 border-pink-200 mt-4">
               <label className="block text-xs font-bold text-gray-700 mb-2">Sizes & Stock for {color.colorName || 'Color'}</label>
-              {color.sizes.map((sz, j) => (
+              {color.sizes.map((sz: any, j: number) => (
                 <div key={j} className="flex gap-2 mb-2 items-center">
                   <input placeholder="Size (e.g. 3-4 Yrs)" value={sz.size} onChange={(e) => updateColorSize(i, j, "size", e.target.value)} className="flex-1 px-2 py-1 text-sm rounded border-2 border-pink-100 focus:border-primary outline-none" />
                   <input type="number" placeholder="Price" value={sz.price} onChange={(e) => updateColorSize(i, j, "price", Number(e.target.value))} className="w-24 px-2 py-1 text-sm rounded border-2 border-pink-100 focus:border-primary outline-none" />
