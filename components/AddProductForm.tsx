@@ -75,7 +75,7 @@ export function AddProductForm({ initialData = null, onClose = () => {} }: { ini
   };
   const removeColorSize = (colorIdx: number, sizeIdx: number) => {
     const updated = [...colors];
-    updated[colorIdx].sizes = updated[colorIdx].sizes.filter((_, idx) => idx !== sizeIdx);
+    updated[colorIdx].sizes = updated[colorIdx].sizes.filter((_: any, idx: number) => idx !== sizeIdx);
     setColors(updated);
   };
   const updateColorSize = (colorIdx: number, sizeIdx: number, key: string, val: string | number) => {
