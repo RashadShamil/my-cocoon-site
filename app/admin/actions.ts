@@ -2,7 +2,7 @@
 
 import { createClient } from "next-sanity";
 import { revalidatePath } from "next/cache";
-import { sendCuteOrderEmail } from "@/lib/sendOrderEmail";
+import { sendCuteOrderEmail, sendStatusUpdateEmail } from "@/lib/sendOrderEmail";
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -36,6 +36,7 @@ export async function createProductAction(formData: FormData) {
     const category = formData.get("category") as string;
     const description = formData.get("description") as string || "";
     const sizeOptionsStr = formData.get("sizeOptions") as string;
+    const colorsStr = formData.get("colors") as string;
     const isSale = formData.get("isSale") === "true";
     const originalPriceStr = formData.get("originalPrice");
     const originalPrice = originalPriceStr ? Number(originalPriceStr) : undefined;
@@ -43,6 +44,30 @@ export async function createProductAction(formData: FormData) {
     let sizeOptions = [];
     if (sizeOptionsStr) {
       sizeOptions = JSON.parse(sizeOptionsStr).map((s: any, idx: number) => ({ ...s, _key: `size-${idx}` }));
+    }
+
+    let colors = [];
+    if (colorsStr) {
+      const parsedColors = JSON.parse(colorsStr);
+      for (let idx = 0; idx < parsedColors.length; idx++) {
+        let c = parsedColors[idx];
+        const colorImageFile = formData.get(`colorImage-${idx}`) as File;
+        let imageObj = c.image; 
+        
+        if (colorImageFile && colorImageFile.size > 0) {
+           const assetId = await handleFileUpload(colorImageFile);
+           if (assetId) {
+             imageObj = { _type: "image", asset: { _type: "reference", _ref: assetId } };
+           }
+        }
+        
+        colors.push({
+          ...c,
+          _key: `color-${idx}`,
+          image: imageObj,
+          sizes: c.sizes?.map((s: any, sIdx: number) => ({ ...s, _key: `size-${idx}-${sIdx}` }))
+        });
+      }
     }
 
     if (!name || !price) throw new Error("Name and Price are required.");
@@ -68,6 +93,7 @@ export async function createProductAction(formData: FormData) {
       price,
       description,
       sizeOptions,
+      colors,
       category: category || "Casual Dresses",
       isSale,
       ...(originalPrice && { originalPrice }),
@@ -90,6 +116,7 @@ export async function updateProductAction(id: string, formData: FormData) {
     const category = formData.get("category") as string;
     const description = formData.get("description") as string || "";
     const sizeOptionsStr = formData.get("sizeOptions") as string;
+    const colorsStr = formData.get("colors") as string;
     const isSale = formData.get("isSale") === "true";
     const originalPriceStr = formData.get("originalPrice");
     const originalPrice = originalPriceStr ? Number(originalPriceStr) : null; // Use null to clear it if it was removed
@@ -99,12 +126,37 @@ export async function updateProductAction(id: string, formData: FormData) {
       sizeOptions = JSON.parse(sizeOptionsStr).map((s: any, idx: number) => ({ ...s, _key: `size-${idx}` }));
     }
 
+    let colors = [];
+    if (colorsStr) {
+      const parsedColors = JSON.parse(colorsStr);
+      for (let idx = 0; idx < parsedColors.length; idx++) {
+        let c = parsedColors[idx];
+        const colorImageFile = formData.get(`colorImage-${idx}`) as File;
+        let imageObj = c.image; 
+        
+        if (colorImageFile && colorImageFile.size > 0) {
+           const assetId = await handleFileUpload(colorImageFile);
+           if (assetId) {
+             imageObj = { _type: "image", asset: { _type: "reference", _ref: assetId } };
+           }
+        }
+        
+        colors.push({
+          ...c,
+          _key: `color-${idx}`,
+          image: imageObj,
+          sizes: c.sizes?.map((s: any, sIdx: number) => ({ ...s, _key: `size-${idx}-${sIdx}` }))
+        });
+      }
+    }
+
     const updates: any = {
       name,
       price,
       category: category || "Casual Dresses",
       description,
       sizeOptions,
+      colors,
       isSale,
       ...(originalPrice !== null ? { originalPrice } : {}) // we'll just not send it if null, or maybe we want to unset it. Let's send it if not null. Wait, setting to null in Sanity unsets it. So we can just set originalPrice: originalPrice
     };
@@ -148,4 +200,20 @@ export async function sendTestEmailAction(toEmail: string) {
       { productName: "Sparkle Tiara", quantity: 1, price: 2000 }
     ]
   }, toEmail);
+}
+
+export async function updateOrderStatusAction(orderId: string, newStatus: string, orderData: any) {
+  try {
+    await client.patch(orderId).set({ status: newStatus }).commit();
+    revalidatePath("/admin/orders", "page");
+    revalidatePath("/admin", "page");
+    
+    if (orderData && orderData.email) {
+      await sendStatusUpdateEmail(orderData, newStatus, orderData.email);
+    }
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }

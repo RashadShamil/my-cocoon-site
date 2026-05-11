@@ -36,7 +36,7 @@ export default {
     },
     {
       name: 'sizeOptions',
-      title: 'Sizes & Variants',
+      title: 'Sizes & Variants (Legacy)',
       type: 'array',
       of: [
         {
@@ -44,6 +44,41 @@ export default {
           fields: [
             { name: 'size', title: 'Size Label', type: 'string' },
             { name: 'price', title: 'Price for this Size', type: 'number' }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'colors',
+      title: 'Color Variants',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'colorName', title: 'Color Name', type: 'string' },
+            { name: 'colorHex', title: 'Color Hex Code (Optional)', type: 'string' },
+            {
+              name: 'image',
+              title: 'Color Specific Image',
+              type: 'image',
+              options: { hotspot: true }
+            },
+            { 
+              name: 'sizes', 
+              title: 'Sizes & Stock', 
+              type: 'array', 
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'size', title: 'Size Label', type: 'string' },
+                    { name: 'price', title: 'Price for this Size', type: 'number' },
+                    { name: 'stock', title: 'Stock Available', type: 'number' }
+                  ]
+                }
+              ]
+            }
           ]
         }
       ]

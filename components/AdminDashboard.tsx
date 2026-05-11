@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Sparkles, Star, ShoppingBag } from "lucide-react";
+import { Sparkles, Star, ShoppingBag, Package } from "lucide-react";
+import Link from "next/link";
 
 // Hardcoded SVGs to fix Lucide issues
 const Box = (props: any) => (
@@ -40,6 +41,7 @@ import { deleteProductAction } from "@/app/admin/actions";
 
 const Edit2 = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>);
 const Trash2 = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>);
+const CopyIcon = (props: any) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>);
 
 interface AdminDashboardProps {
   orders: any[];
@@ -49,7 +51,7 @@ interface AdminDashboardProps {
 
 // Reusable Order Card block
 const OrderCard = ({ order }: { order: any }) => (
-  <div className="p-4 rounded-2xl bg-white/50 border border-white/40 hover:bg-white/80 transition-colors shadow-sm mb-3">
+  <Link href="/admin/orders" className="block p-4 rounded-2xl bg-white/50 border border-white/40 hover:bg-white/80 transition-all hover:scale-[1.02] shadow-sm mb-3">
     <div className="flex justify-between items-start mb-2">
       <div>
         <p className="font-bold text-gray-900 text-lg">{order.customerName}</p>
@@ -78,7 +80,7 @@ const OrderCard = ({ order }: { order: any }) => (
         {order.orderDate || (order._createdAt ? order._createdAt.slice(0, 10) : 'N/A')}
       </span>
     </div>
-  </div>
+  </Link>
 );
 
 export function AdminDashboard({ orders, products, reviews }: AdminDashboardProps) {
@@ -176,7 +178,7 @@ export function AdminDashboard({ orders, products, reviews }: AdminDashboardProp
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
               Cocoon Kids Admin
             </h1>
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4 items-center mt-4 md:mt-0">
                <TestEmailButton />
             </div>
           </div>
@@ -236,8 +238,9 @@ export function AdminDashboard({ orders, products, reviews }: AdminDashboardProp
                       <p className="text-xs text-gray-500 mt-1">{p.sizeOptions?.length || 0} Variants</p>
                       
                       <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                        <button onClick={() => { setEditingProduct(p); setShowProductModal(true); }} className="p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow"><Edit2/></button>
-                        <button onClick={() => handleDeleteProduct(p._id)} className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow"><Trash2/></button>
+                        <button onClick={() => { setEditingProduct(p); setShowProductModal(true); }} className="p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow" title="Edit"><Edit2/></button>
+                        <button onClick={() => { setEditingProduct({...p, _id: undefined, name: p.name + " (Copy)"}); setShowProductModal(true); }} className="p-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 shadow" title="Duplicate"><CopyIcon/></button>
+                        <button onClick={() => handleDeleteProduct(p._id)} className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow" title="Delete"><Trash2/></button>
                       </div>
                     </div>
                   ))}
@@ -280,9 +283,14 @@ export function AdminDashboard({ orders, products, reviews }: AdminDashboardProp
             <div className="space-y-6">
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                 <div className="bg-amber-500/10 border-2 border-amber-200/50 p-5 rounded-[2rem] shadow-md backdrop-blur-md">
-                  <h3 className="text-lg font-extrabold text-amber-800 mb-4 flex items-center gap-2">
-                    <Box className="w-5 h-5" /> Current Orders <span className="bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full text-xs">{currentOrders.length}</span>
-                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-extrabold text-amber-800 flex items-center gap-2">
+                      <Box className="w-5 h-5" /> Current Orders <span className="bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full text-xs">{currentOrders.length}</span>
+                    </h3>
+                    <Link href="/admin/orders" className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded-full font-bold shadow hover:bg-amber-700 transition flex items-center gap-1">
+                      Manage All
+                    </Link>
+                  </div>
                   <div className="max-h-60 overflow-y-auto pr-1 custom-scrollbar">
                     {currentOrders.map(o => <OrderCard key={o._id} order={o} />)}
                     {currentOrders.length === 0 && <p className="text-amber-800/60 font-medium italic text-sm">No pending orders.</p>}

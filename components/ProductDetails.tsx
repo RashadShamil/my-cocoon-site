@@ -39,6 +39,7 @@ interface ProductProps {
     gallery?: string[];
     category: string;
     sizeOptions?: { size: string; price: number }[];
+    colors?: { colorName: string; colorHex: string; imageUrl?: string; sizes: { size: string; price: number; stock: number }[] }[];
     reviews?: Review[];
     isSale?: boolean;
     originalPrice?: number;
@@ -56,6 +57,7 @@ export default function ProductDetails({ product }: ProductProps) {
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.5]);
 
+  const [selectedColor, setSelectedColor] = useState<any | null>(product.colors && product.colors.length > 0 ? product.colors[0] : null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [currentPrice, setCurrentPrice] = useState(product.price);
   const [quantity, setQuantity] = useState(1);
@@ -76,9 +78,22 @@ export default function ProductDetails({ product }: ProductProps) {
   const allImages = [product.imageUrl, ...(product.gallery || [])];
   const [mainImage, setMainImage] = useState(allImages[0]);
 
+  const hasColors = product.colors && product.colors.length > 0;
+  const availableSizes = hasColors && selectedColor ? selectedColor.sizes : (product.sizeOptions || []);
+
   const handleSizeSelect = (size: string, price?: number) => {
     setSelectedSize(size);
     if (price) setCurrentPrice(price);
+  };
+  
+  const handleColorSelect = (color: any) => {
+    setSelectedColor(color);
+    setSelectedSize(null); // Reset size when color changes
+    if (color.imageUrl) {
+      setMainImage(color.imageUrl);
+    } else {
+      setMainImage(product.imageUrl);
+    }
   };
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -86,7 +101,7 @@ export default function ProductDetails({ product }: ProductProps) {
       router.push("/login");
       return;
     }
-    if (product.sizeOptions && product.sizeOptions.length > 0 && !selectedSize) {
+    if (availableSizes.length > 0 && !selectedSize) {
       alert("Please select a size first!");
       return;
     }
@@ -103,9 +118,10 @@ export default function ProductDetails({ product }: ProductProps) {
     });
 
     for(let i = 0; i < quantity; i++) {
+        const colorText = selectedColor ? ` (Color: ${selectedColor.colorName})` : "";
         addToCart({
             _id: product._id,
-            name: product.name,
+            name: `${product.name}${colorText}`,
             price: currentPrice,
             imageUrl: product.imageUrl,
         }, selectedSize || "Standard");
@@ -113,12 +129,13 @@ export default function ProductDetails({ product }: ProductProps) {
   };
 
   const handleWhatsAppBuy = () => {
-    if (product.sizeOptions && product.sizeOptions.length > 0 && !selectedSize) {
+    if (availableSizes.length > 0 && !selectedSize) {
       alert("Please select a size first!");
       return;
     }
     const phoneNumber = "94701327373"; 
-    const message = `Hi! I would like to order: ${product.name} (Size: ${selectedSize || "Standard"})`;
+    const colorText = selectedColor ? ` (Color: ${selectedColor.colorName})` : "";
+    const message = `Hi! I would like to order: ${product.name}${colorText} (Size: ${selectedSize || "Standard"})`;
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
@@ -239,21 +256,44 @@ export default function ProductDetails({ product }: ProductProps) {
 
               <p className="text-gray-600 leading-relaxed mb-8 text-lg">{product.description}</p>
 
-              {product.sizeOptions && product.sizeOptions.length > 0 && (
+              {hasColors && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Select Color</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {product.colors!.map((color, index) => (
+                      <button 
+                        key={index} 
+                        onClick={() => handleColorSelect(color)} 
+                        suppressHydrationWarning={true}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all duration-200 font-medium ${selectedColor?.colorName === color.colorName ? "border-primary bg-primary/5 shadow-md" : "border-gray-200 text-gray-600 hover:border-primary/50 bg-white"}`}
+                      >
+                        <span className="w-5 h-5 rounded-full border border-gray-200 shadow-inner" style={{ backgroundColor: color.colorHex }}></span>
+                        <span className="text-sm font-bold text-gray-800">{color.colorName}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {availableSizes.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Select Size</h3>
                   <div className="flex flex-wrap gap-3">
-                    {product.sizeOptions.map((option, index) => (
+                    {availableSizes.map((option: any, index: number) => {
+                      const isOutOfStock = option.stock !== undefined && option.stock <= 0;
+                      return (
                       <button 
                         key={index} 
-                        onClick={() => handleSizeSelect(option.size, option.price)} 
-                        suppressHydrationWarning={true} // ✅ Suppress warning
-                        className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 font-medium ${selectedSize === option.size ? "border-primary bg-primary/5 text-primary scale-105 shadow-md" : "border-gray-200 text-gray-600 hover:border-primary/50 bg-white"}`}
+                        onClick={() => !isOutOfStock && handleSizeSelect(option.size, option.price)} 
+                        suppressHydrationWarning={true}
+                        disabled={isOutOfStock}
+                        className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 font-medium ${isOutOfStock ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-400" : selectedSize === option.size ? "border-primary bg-primary/5 text-primary scale-105 shadow-md" : "border-gray-200 text-gray-600 hover:border-primary/50 bg-white"}`}
                       >
                         <span className="block text-sm font-bold">{option.size}</span>
                         <span className="block text-xs opacity-70">Rs. {option.price}</span>
+                        {isOutOfStock && <span className="block text-[10px] font-bold text-red-500 mt-1">Out of Stock</span>}
                       </button>
-                    ))}
+                    )})}
                   </div>
                 </div>
               )}

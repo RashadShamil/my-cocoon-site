@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "next-sanity";
+import { sendCuteOrderEmail, sendAdminNotificationEmail } from "@/lib/sendOrderEmail";
 
 const writeClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -42,6 +43,14 @@ export async function POST(req: Request) {
     };
 
     const result = await writeClient.create(orderDoc);
+
+    // Send emails
+    try {
+      await sendCuteOrderEmail(orderDoc, formData.email);
+      await sendAdminNotificationEmail(orderDoc);
+    } catch (emailErr) {
+      console.error("Failed to send emails:", emailErr);
+    }
 
     return NextResponse.json({ message: "Order Created", orderId: result._id });
 

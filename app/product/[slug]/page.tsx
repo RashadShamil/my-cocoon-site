@@ -13,6 +13,10 @@ const getData = async (slug: string) => {
     "gallery": gallery[].asset->url,
     "slug": slug.current,
     sizeOptions,
+    "colors": colors[]{
+      ...,
+      "imageUrl": image.asset->url
+    },
     // Fetch reviews
     "reviews": *[_type == "review" && references(^._id)] | order(_createdAt desc) {
       _id,
